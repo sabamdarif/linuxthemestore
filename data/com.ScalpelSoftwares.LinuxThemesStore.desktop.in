@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=Linux Themes Store
+Exec=/usr/@bindir@/linuxthemesstore
+Icon=/usr/share/icons/hicolor/256x256/apps/com.ScalpelSoftwares.LinuxThemesStore.png
+Type=Application
+Categories=Utility;
