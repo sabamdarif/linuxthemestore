@@ -1,10 +1,10 @@
 [Desktop Entry]
 Name=Linux Themes Store
+Comment=A Native Desktop Linux theme installer for Linux
 Exec=@bindir@/linuxthemesstore
 Icon=com.ScalpelSoftwares.LinuxThemesStore
 Type=Application
 Terminal=false
 StartupNotify=true
-OnlyShowIn=GNOME;Unity;
-Categories=GNOME;GTK;Utility;Core;
+Categories=Utility;Core;
 NoDisplay=false

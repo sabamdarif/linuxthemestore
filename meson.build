@@ -10,11 +10,11 @@ build_target = custom_target(
   output: 'linuxthemesstore',
     command: [
     'sh', '-c',
-    'rm linuxthemesstore && cargo build --release && chmod 755 ../target/release/linuxthemesstore && cp ../target/release/linuxthemesstore linuxthemesstore'
+    'rm ../executable/linuxthemesstore && cargo build --release && chmod 755 ../target/release/linuxthemesstore && cp ../target/release/linuxthemesstore ../executable/linuxthemesstore'
   ],
 )
 
-install_data('linuxthemesstore',
+install_data('executable/linuxthemesstore',
   install_dir: get_option('prefix') / get_option('bindir'),
   install_mode: ['rwxr-xr-x']
 )
