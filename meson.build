@@ -4,22 +4,19 @@ gnome = import('gnome')
 cargo = find_program('cargo', required: true)
 
 # Build the Rust binary
-build_cmd = [
-  cargo, 'build', '--release'
-]
-
 build_target = custom_target(
-  'linuxthemesstore-bin',
+  'linuxthemesstore',
   build_by_default: true,
   output: 'linuxthemesstore',
-  command: build_cmd,
+    command: [
+    'sh', '-c',
+    'rm linuxthemesstore && cargo build --release && chmod 755 ../target/release/linuxthemesstore && cp ../target/release/linuxthemesstore linuxthemesstore'
+  ],
 )
 
-# Manually install the binary from target/release
-install_data(
-  'target/release/linuxthemesstore',
-  install_dir: get_option('bindir'),
-  rename: 'linuxthemesstore'
+install_data('linuxthemesstore',
+  install_dir: get_option('prefix') / get_option('bindir'),
+  install_mode: ['rwxr-xr-x']
 )
 
 # Install the app icon
