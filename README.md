@@ -6,6 +6,7 @@
 - Just browse, click, and beautify your desktop!
 
 Here are some screenshots
+
 [![Thumbnail](https://i.ibb.co/v64sy4yh/1.png)](https://i.ibb.co/mV5vZ5Z0/1.png)
 
 [![Thumbnail](https://i.ibb.co/Xhqqdd8/2.png)](https://i.ibb.co/63kkppB/2.png)
