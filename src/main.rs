@@ -1,10 +1,9 @@
-use adw::glib::object::{IsA, ObjectExt};
-use adw::glib::property::PropertyGet;
+use adw::glib::object::IsA;
 use adw::gtk::DrawingArea;
 use adw::prelude::{ActionRowExt, AdwDialogExt, ExpanderRowExt, PreferencesGroupExt};
 use chrono::DateTime;
 use gtk4::prelude::{
-    ButtonExt, CheckButtonExt, DrawingAreaExt, DrawingAreaExtManual, FlowBoxChildExt, ListBoxRowExt,
+    ButtonExt, DrawingAreaExt, DrawingAreaExtManual,
 };
 use gtk4::{Button, ContentFit, CssProvider, GestureClick, Image, License};
 use reqwest::blocking::Client;
@@ -393,7 +392,7 @@ fn install_theme(downloaddetail: &DownloadDetail, themetype: &Catalog) -> Result
     path.push_str(themetype.to_string());
     path.push_str("/");
 
-    let r = fs::create_dir_all(&path.as_str());
+    let _r = fs::create_dir_all(&path.as_str());
     path.push_str(&downloaddetail.downloadname);
     // Check if the file exists in cache, then skip download
     match std::path::Path::new(&path).exists() {
@@ -477,7 +476,7 @@ impl CircleRating {
         area.set_content_height(50); // Height of a circle
 
         let rating_clone = rating.clone();
-        area.set_draw_func(move |_, cr, width, height| {
+        area.set_draw_func(move |_, cr, _width, height| {
             let rating = *rating_clone.borrow();
             let circle_diameter = 15.0;
             let spacing = 5.0;
@@ -978,7 +977,7 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
         let current_index = Arc::new(Mutex::new((0, total_preview_pics)));
         let previewpics = product.previewpics.clone();
         let img_prev = img.clone();
-        prev_button.connect_clicked(move |prev_button| {
+        prev_button.connect_clicked(move |_prev_button| {
             let mut curret_index_mutex = current_index.lock().unwrap();
             let (current_index, total_preview_pics) = curret_index_mutex.deref_mut();
             if *current_index == 0 {
@@ -994,7 +993,7 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
         let current_index = Arc::new(Mutex::new((0, total_preview_pics as i32)));
         let previewpics_next = product.previewpics.clone();
         let img_next = img.clone();
-        next_button.connect_clicked(move |next_button| {
+        next_button.connect_clicked(move |_next_button| {
             let mut curret_index_mutex = current_index.lock().unwrap();
             let (current_index, total_preview_pics) = curret_index_mutex.deref_mut();
             if *current_index == (*total_preview_pics - 1) {
