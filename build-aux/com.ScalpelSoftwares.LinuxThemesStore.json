@@ -12,7 +12,9 @@
         "--share=ipc",
         "--socket=fallback-x11",
         "--device=dri",
-        "--socket=wayland"
+        "--socket=wayland",
+        "--filesystem=~/.local/share/icons/:rw",
+        "--filesystem=~/.local/share/themes/:rw"
     ],
     "build-options" : {
         "append-path" : "/usr/lib/sdk/rust-stable/bin",
@@ -34,10 +36,6 @@
         "/share/pkgconfig",
         "*.la",
         "*.a"
-    ],
-    "filesystem": [
-    "~/.local/share/icons/",
-    "~/.local/share/themes/"
     ],
     "modules": [
         {
@@ -66,5 +64,4 @@
             ]
         }
     ]
-
 }
