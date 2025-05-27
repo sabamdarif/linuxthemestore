@@ -18,10 +18,8 @@
     ],
     "build-options" : {
         "append-path" : "/usr/lib/sdk/rust-stable/bin",
-        "build-args" : [
-            "--share=network"
-        ],
         "env" : {
+            "RUSTFLAGS": "-C opt-level=3",
             "RUST_BACKTRACE" : "1",
             "RUST_LOG" : "linuxthemesstore=debug"
         }
@@ -37,16 +35,31 @@
         "*.la",
         "*.a"
     ],
-    "modules": [
-        {
-        "name": "cargobuild",
-        "buildsystem": "meson",
-        "sources": [
-            {
-            "type": "dir",
-            "path": "."
-            }
-            ]
-        }
+  "sources": [
+    {
+      "type": "dir",
+      "path": "linuxthemesstore"
+    },
+      {
+	"type": "dir",
+	"path": "linuxthemestore/vendor"
+      },
+      {
+        "type": "file",
+        "path": "linuxthemestore/.cargo/config.toml",
+        "dest": ".cargo/config.toml"
+      }
+  ],
+"modules": [
+  {
+    "name": "cargobuild",
+    "buildsystem": "meson",
+    "sources": [
+      {
+	"type": "dir",
+	"path": "."
+      }
     ]
+  }
+]
 }
