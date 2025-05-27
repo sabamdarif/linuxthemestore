@@ -47,21 +47,6 @@
             "path": ".."
             }
             ]
-        },
-        {
-            "name" : "bincopy",
-            "buildsystem": "simple",
-            "build-commands": [
-                "pwd",
-                "cp linuxthemesstore /app/bin/linuxthemesstore",
-                "chmod +x /app/bin/linuxthemesstore"
-            ],
-            "sources" : [
-                {
-                "type" : "file",
-                "path" : "../target/release/linuxthemesstore"
-                }
-            ]
         }
     ]
 }
