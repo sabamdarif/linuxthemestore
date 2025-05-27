@@ -2,7 +2,7 @@
 Name=Linux Themes Store
 Comment=A Native Desktop Linux theme installer for Linux
 Exec=@bindir@/linuxthemesstore
-Icon=com.ScalpelSoftwares.LinuxThemesStore
+Icon=com.github.debasishpatra1987.linuxthemesstore
 Type=Application
 Terminal=false
 StartupNotify=true

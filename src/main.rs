@@ -1424,7 +1424,7 @@ fn main() -> glib::ExitCode {
 
     // Create a new application
     let app = adw::Application::builder()
-        .application_id("com.ScalpelSoftwares.LinuxThemesStore")
+        .application_id("com.github.debasish-patra-1987.linuxthemesstore")
         .build();
 
     app.connect_activate(build_ui);
@@ -1490,7 +1490,7 @@ fn build_ui(app: &adw::Application) {
     // Connect button to show AdwAboutWindow
 
         let about_dialog = AboutDialog::builder()
-            .application_name("Linux Themes Store")
+            .application_name("Linux Theme Store")
             .developer_name("Debasish Patra")
             .version("1.0.0")
             .license_type(License::MitX11)

@@ -47,14 +47,14 @@ Installation
 ```
 git clone https://github.com/debasish-patra-1987/linuxthemestore.git
 cd linuxthemestore
-flatpak-builder --force-clean build/ build-aux/com.ScalpelSoftwares.LinuxThemesStore.json
-flatpak build-export export build
-flatpak build-bundle export LinuxThemeStore.flatpak com.ScalpelSoftwares.LinuxThemesStore
+flatpak-builder --force-clean build/ com.github.debasish-patra-1987.linuxthemestore.json
+flatpak build-export export build/
+flatpak build-bundle export LinuxThemeStore.flatpak com.github.debasish-patra-1987.linuxthemestore
 flatpak install LinuxThemeStore.flatpak
 ```
 Uninstall
 ```
-flatpak uninstall com.ScalpelSoftwares.LinuxThemesStore 
+flatpak uninstall com.github.debasish-patra-1987.linuxthemestore 
 ```
 ## License
 MIT

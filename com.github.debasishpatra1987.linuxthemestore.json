@@ -1,12 +1,12 @@
 {
-    "id" : "com.ScalpelSoftwares.LinuxThemesStore",
+    "id" : "com.github.debasishpatra1987.linuxthemestore",
     "runtime" : "org.gnome.Platform",
     "runtime-version" : "48",
     "sdk" : "org.gnome.Sdk",
     "sdk-extensions" : [
         "org.freedesktop.Sdk.Extension.rust-stable"
     ],
-    "command" : "linuxthemesstore",
+    "command" : "linuxthemestore",
     "finish-args" : [
         "--share=network",
         "--share=ipc",
@@ -21,7 +21,7 @@
         "env" : {
             "RUSTFLAGS": "-C opt-level=3",
             "RUST_BACKTRACE" : "1",
-            "RUST_LOG" : "linuxthemesstore=debug"
+            "RUST_LOG" : "linuxthemestore=debug"
         }
     },
     "cleanup" : [
@@ -38,7 +38,7 @@
   "sources": [
     {
       "type": "dir",
-      "path": "linuxthemesstore"
+      "path": "linuxthemestore"
     },
       {
 	"type": "dir",
