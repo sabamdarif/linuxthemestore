@@ -35,17 +35,36 @@
         "*.la",
         "*.a"
     ],
-    "modules" : [
+    "filesystem": [
+    "~/.local/share/icons/",
+    "~/.local/share/themes/"
+    ],
+    "modules": [
         {
-            "name" : "linuxthemesstore",
-            "builddir" : true,
-            "buildsystem" : "meson",
+        "name": "cargobuild",
+        "buildsystem": "meson",
+        "sources": [
+            {
+            "type": "dir",
+            "path": ".."
+            }
+            ]
+        },
+        {
+            "name" : "bincopy",
+            "buildsystem": "simple",
+            "build-commands": [
+                "pwd",
+                "cp linuxthemesstore /app/bin/linuxthemesstore",
+                "chmod +x /app/bin/linuxthemesstore"
+            ],
             "sources" : [
                 {
-                    "type" : "git",
-                    "url" : "https://github.com/debasish-patra-1987/linuxthemestore.git"
+                "type" : "file",
+                "path" : "../target/release/linuxthemesstore"
                 }
             ]
         }
     ]
+
 }

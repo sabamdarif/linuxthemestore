@@ -1,6 +1,10 @@
 [Desktop Entry]
 Name=Linux Themes Store
-Exec=/usr/@bindir@/linuxthemesstore
-Icon=/usr/share/icons/hicolor/256x256/apps/com.ScalpelSoftwares.LinuxThemesStore.png
+Exec=@bindir@/linuxthemesstore
+Icon=com.ScalpelSoftwares.LinuxThemesStore
 Type=Application
-Categories=Utility;
+Terminal=false
+StartupNotify=true
+OnlyShowIn=GNOME;Unity;
+Categories=GNOME;GTK;Utility;Core;
+NoDisplay=false

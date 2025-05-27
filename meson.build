@@ -24,26 +24,25 @@ install_data(
 
 # Install the app icon
 install_data(
-  'assets/com.ScalpelSoftwares.LinuxThemesStore.png',
-  install_dir: join_paths(get_option('datadir'), 'icons/hicolor/256x256/apps'),
+  'assets/com.ScalpelSoftwares.LinuxThemesStore.svg',
+  install_dir: join_paths(get_option('datadir'), 'icons/hicolor/scalable/apps'),
 )
 
 # Configure and install desktop file
 desktop_file = configure_file(
   input: 'data/com.ScalpelSoftwares.LinuxThemesStore.desktop.in',
   output: 'com.ScalpelSoftwares.LinuxThemesStore.desktop',
-  configuration: {'bindir': get_option('bindir')}
+  configuration: {'bindir': get_option('prefix') / get_option('bindir')}
 )
 
 install_data(
   desktop_file,
   install_dir: join_paths(get_option('datadir'), 'applications'),
-  install_mode: ['rwxr-xr-x', 'root', 'root']
+  install_mode: ['rwxr-xr-x']
 )
 
 gnome.post_install(
-     glib_compile_schemas: true,
     gtk_update_icon_cache: true,
-  update_desktop_database: true,
+    update_desktop_database: true,
 )
 

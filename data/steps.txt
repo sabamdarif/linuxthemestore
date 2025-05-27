@@ -1,2 +1,0 @@
-meson setup builddir --prefix=/usr
-meson compile -C builddir

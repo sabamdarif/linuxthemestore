@@ -1,47 +1,40 @@
-use adw::glib::object::{CastNone, IsA, ObjectExt};
+use adw::glib::object::{IsA, ObjectExt};
 use adw::glib::property::PropertyGet;
 use adw::gtk::DrawingArea;
 use adw::prelude::{ActionRowExt, AdwDialogExt, ExpanderRowExt, PreferencesGroupExt};
-use chrono::{DateTime, NaiveDate};
+use chrono::DateTime;
 use gtk4::prelude::{
     ButtonExt, CheckButtonExt, DrawingAreaExt, DrawingAreaExtManual, FlowBoxChildExt, ListBoxRowExt,
 };
-use gtk4::{
-    Button, CheckButton, ContentFit, CssProvider, GestureClick, Image, License, ListBoxRow,
-    PositionType, StackTransitionType, StyleContext, ToggleButton,
-};
+use gtk4::{Button, ContentFit, CssProvider, GestureClick, Image, License};
 use reqwest::blocking::Client;
 use serde::de::Deserializer;
 use serde::{Deserialize, Serialize};
-use serde_json::error::Category;
-use std::any::Any;
-use std::cell::{Cell, RefCell};
+use std::cell::RefCell;
 use std::collections::HashMap;
 
 use std::ops::{Deref, DerefMut};
 use std::rc::Rc;
-use std::thread::{self, current};
+use std::thread::{self};
 
 use std::fs;
 use std::fs::File;
 use std::io::Write;
 use std::sync::{Arc, Mutex};
 
-use adw::gio::prelude::{ApplicationExt, ApplicationExtManual, ListModelExtManual};
+use adw::gio::prelude::{ApplicationExt, ApplicationExtManual};
 use adw::gtk::prelude::{BoxExt, GtkWindowExt, WidgetExt};
 use adw::gtk::{
     glib, Align, Box as GtkBox, FlowBox, Label, ListBox, Orientation, Picture, PolicyType,
     ScrolledWindow, SelectionMode,
 };
 use adw::{
-    gdk, AboutDialog, AboutWindow, ActionRow, ApplicationWindow, Clamp, ExpanderRow, HeaderBar,
-    PreferencesGroup, PreferencesRow, Spinner, Toggle, ViewStack, Window,
+    gdk, AboutDialog, ActionRow, ApplicationWindow, Clamp, ExpanderRow, HeaderBar,
+    PreferencesGroup, Spinner, ViewStack,
 };
 use gtk4::pango::EllipsizeMode;
 
 // Libadwwaita Libraries
-use adw::NavigationPage as AdwNavigationPage;
-use adw::NavigationView as AdwNavigationView;
 
 pub type Error = std::boxed::Box<dyn core::error::Error>;
 pub type Result<T> = core::result::Result<T, Error>;
