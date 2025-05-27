@@ -1,7 +1,7 @@
 {
     "id" : "com.ScalpelSoftwares.LinuxThemesStore",
     "runtime" : "org.gnome.Platform",
-    "runtime-version" : "master",
+    "runtime-version" : "48",
     "sdk" : "org.gnome.Sdk",
     "sdk-extensions" : [
         "org.freedesktop.Sdk.Extension.rust-stable"
@@ -44,7 +44,7 @@
         "sources": [
             {
             "type": "dir",
-            "path": ".."
+            "path": "."
             }
             ]
         }

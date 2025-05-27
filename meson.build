@@ -10,7 +10,7 @@ build_target = custom_target(
   output: 'linuxthemesstore',
     command: [
     'sh', '-c',
-    'rm ../executable/linuxthemesstore && cargo build --release && chmod 755 ../target/release/linuxthemesstore && cp ../target/release/linuxthemesstore ../executable/linuxthemesstore'
+    'cargo build --release --target-dir . && chmod 755 target/release/linuxthemesstore rm ../executable/linuxthemesstore && cp target/release/linuxthemesstore ../executable/linuxthemesstore'
   ],
 )
 
