@@ -23,17 +23,6 @@
             "RUST_LOG" : "linuxthemestore=debug"
         }
     },
-    "cleanup" : [
-        "/include",
-        "/lib/pkgconfig",
-        "/man",
-        "/share/doc",
-        "/share/gtk-doc",
-        "/share/man",
-        "/share/pkgconfig",
-        "*.la",
-        "*.a"
-    ],
 "modules": [
   {
     "name": "cargobuild",
@@ -46,8 +35,33 @@
       {
 	"type": "dir",
 	"path": "./vendor"
-      }
-    ]
+      },
+	{
+	"type": "file",
+	"path": "./io.github.debasishpatra1987.linuxthemestore.metainfo.xml"
+	},
+
+        {
+          "type": "file",
+          "path": "screenshots/1.png"
+        },
+        {
+          "type": "file",
+          "path": "screenshots/2.png"
+        },
+        {
+          "type": "file",
+          "path": "screenshots/3.png"
+        },
+        {
+          "type": "file",
+          "path": "screenshots/4.png"
+        },
+        {
+          "type": "file",
+          "path": "screenshots/5.png"
+        }
+]
   }
 ]
 }
