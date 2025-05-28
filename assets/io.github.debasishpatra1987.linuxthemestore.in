@@ -2,7 +2,7 @@
 Name=Linux Themes Store
 Comment=A Native Desktop Linux theme installer for Linux
 Exec=@bindir@/linuxthemestore
-Icon=com.github.debasishpatra1987.linuxthemestore
+Icon=io.github.debasishpatra1987.linuxthemestore
 Type=Application
 Terminal=false
 StartupNotify=true

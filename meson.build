@@ -21,14 +21,14 @@ install_data('executable/linuxthemestore',
 
 # Install the app icon
 install_data(
-  'assets/com.github.debasishpatra1987.linuxthemestore.svg',
+  'assets/io.github.debasishpatra1987.linuxthemestore.svg',
   install_dir: join_paths(get_option('datadir'), 'icons/hicolor/scalable/apps'),
 )
 
 # Configure and install desktop file
 desktop_file = configure_file(
-  input: 'assets/com.github.debasishpatra1987.linuxthemestore.in',
-  output: 'com.github.debasishpatra1987.linuxthemestore.desktop',
+  input: 'assets/io.github.debasishpatra1987.linuxthemestore.in',
+  output: 'io.github.debasishpatra1987.linuxthemestore.desktop',
   configuration: {'bindir': get_option('prefix') / get_option('bindir')}
 )
 

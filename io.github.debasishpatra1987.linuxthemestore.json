@@ -1,5 +1,5 @@
 {
-    "id" : "com.github.debasishpatra1987.linuxthemestore",
+    "id" : "io.github.debasishpatra1987.linuxthemestore",
     "runtime" : "org.gnome.Platform",
     "runtime-version" : "48",
     "sdk" : "org.gnome.Sdk",
