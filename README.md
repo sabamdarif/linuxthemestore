@@ -49,8 +49,8 @@ git clone https://github.com/debasish-patra-1987/linuxthemestore.git
 cd linuxthemestore
 flatpak-builder --force-clean build/ com.github.debasish-patra-1987.linuxthemestore.json
 flatpak build-export export build/
-flatpak build-bundle export LinuxThemeStore.flatpak com.github.debasish-patra-1987.linuxthemestore
-flatpak install LinuxThemeStore.flatpak
+flatpak build-bundle export com.github.debasish-patra-1987.linuxthemestore.flatpak com.github.debasish-patra-1987.linuxthemestore
+flatpak install com.github.debasish-patra-1987.linuxthemestore.flatpak
 ```
 Uninstall
 ```
