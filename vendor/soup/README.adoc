@@ -1,0 +1,42 @@
+= Soup
+
+Inspired by the python library https://www.crummy.com/software/BeautifulSoup/bs4/doc/[BeautifulSoup], this is a layer on top of https://github.com/servo/html5ever[html5ever]
+that adds a different API for querying & manipulating HTML
+
+https://docs.rs/soup[Documentation (latest release)]
+
+http://pwoolcoc.gitlab.io/soup/[Documentation (master)]
+
+== Installation
+
+In order to use, add the following to your `Cargo.toml`:
+
+----
+[dependencies]
+soup = "0.5"
+----
+
+== Usage
+
+----
+// src/main.rs
+extern crate reqwest;
+extern crate soup;
+
+use std::error::Error;
+
+use reqwest;
+use soup::prelude::*;
+
+fn main() -> Result<(), Box<Error>> {
+    let response = reqwest::get("https://google.com")?;
+    let soup = Soup::from_reader(response);
+    let some_text = soup.tag("p")
+			.attr("class", "hidden")
+			.find()
+			.and_then(|p| p.text());
+    OK(())
+}
+
+----
+
