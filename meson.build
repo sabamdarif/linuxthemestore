@@ -27,7 +27,7 @@ install_data(
 
 # Configure and install desktop file
 desktop_file = configure_file(
-  input: 'data/com.github.debasishpatra1987.linuxthemestore.in',
+  input: 'assets/com.github.debasishpatra1987.linuxthemestore.in',
   output: 'com.github.debasishpatra1987.linuxthemestore.desktop',
   configuration: {'bindir': get_option('prefix') / get_option('bindir')}
 )

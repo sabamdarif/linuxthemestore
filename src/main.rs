@@ -1,9 +1,10 @@
-use adw::glib::object::IsA;
+use adw::glib::object::{IsA, ObjectExt};
+use adw::glib::property::PropertyGet;
 use adw::gtk::DrawingArea;
 use adw::prelude::{ActionRowExt, AdwDialogExt, ExpanderRowExt, PreferencesGroupExt};
 use chrono::DateTime;
 use gtk4::prelude::{
-    ButtonExt, DrawingAreaExt, DrawingAreaExtManual,
+    ButtonExt, CheckButtonExt, DrawingAreaExt, DrawingAreaExtManual, FlowBoxChildExt, ListBoxRowExt,
 };
 use gtk4::{Button, ContentFit, CssProvider, GestureClick, Image, License};
 use reqwest::blocking::Client;
@@ -392,7 +393,7 @@ fn install_theme(downloaddetail: &DownloadDetail, themetype: &Catalog) -> Result
     path.push_str(themetype.to_string());
     path.push_str("/");
 
-    let _r = fs::create_dir_all(&path.as_str());
+    let r = fs::create_dir_all(&path.as_str());
     path.push_str(&downloaddetail.downloadname);
     // Check if the file exists in cache, then skip download
     match std::path::Path::new(&path).exists() {
@@ -476,7 +477,7 @@ impl CircleRating {
         area.set_content_height(50); // Height of a circle
 
         let rating_clone = rating.clone();
-        area.set_draw_func(move |_, cr, _width, height| {
+        area.set_draw_func(move |_, cr, width, height| {
             let rating = *rating_clone.borrow();
             let circle_diameter = 15.0;
             let spacing = 5.0;
@@ -977,7 +978,7 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
         let current_index = Arc::new(Mutex::new((0, total_preview_pics)));
         let previewpics = product.previewpics.clone();
         let img_prev = img.clone();
-        prev_button.connect_clicked(move |_prev_button| {
+        prev_button.connect_clicked(move |prev_button| {
             let mut curret_index_mutex = current_index.lock().unwrap();
             let (current_index, total_preview_pics) = curret_index_mutex.deref_mut();
             if *current_index == 0 {
@@ -993,7 +994,7 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
         let current_index = Arc::new(Mutex::new((0, total_preview_pics as i32)));
         let previewpics_next = product.previewpics.clone();
         let img_next = img.clone();
-        next_button.connect_clicked(move |_next_button| {
+        next_button.connect_clicked(move |next_button| {
             let mut curret_index_mutex = current_index.lock().unwrap();
             let (current_index, total_preview_pics) = curret_index_mutex.deref_mut();
             if *current_index == (*total_preview_pics - 1) {
@@ -1424,7 +1425,7 @@ fn main() -> glib::ExitCode {
 
     // Create a new application
     let app = adw::Application::builder()
-        .application_id("com.github.debasish-patra-1987.linuxthemesstore")
+        .application_id("com.github.debasishpatra1987.linuxthemestore")
         .build();
 
     app.connect_activate(build_ui);
@@ -1455,10 +1456,8 @@ fn build_ui(app: &adw::Application) {
     view_switcher.set_stack(Some(&view_stack));
 
     // Header Bar Setup below
-    //let header_title = adw::WindowTitle::new("Themes Installer", "Scalpel Softwares");
     header_box.set_hexpand(true);
     header_box.set_vexpand(true);
-    //header_bar.pack_start(&header_title);
     view_switcher.set_can_shrink(true);
 
     let view_switcher_box = GtkBox::new(Orientation::Horizontal, 0);
@@ -1500,33 +1499,6 @@ fn build_ui(app: &adw::Application) {
         about_dialog.present(Some(&window_clone));
         });
 
-    //window.set_titlebar(Some(&header_bar));
-    // Set main content
-    /*
-        //Gtk3/4 Themes
-        build_category_page(
-            &view_stack,
-            &outer_view_stack,
-            &Catalog::Gtk4Themes,
-            &window,
-        );
-        //FullIcon Themes
-        build_category_page(
-            &view_stack,
-            &outer_view_stack,
-            &Catalog::FullIconThemes,
-            &window,
-        );
-        //GnomeShell
-        build_category_page(
-            &view_stack,
-            &outer_view_stack,
-            &Catalog::GnomeShellThemes,
-            &window,
-        );
-        //Cursor
-        build_category_page(&view_stack, &outer_view_stack, &Catalog::Cursors, &window);
-    */
     for each_catalog_type in Catalog::get_all_catalog_types() {
         build_category_page(&view_stack, &outer_view_stack, &each_catalog_type, &window);
     }
