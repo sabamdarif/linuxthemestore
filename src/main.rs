@@ -1424,7 +1424,7 @@ fn main() -> glib::ExitCode {
 
     // Create a new application
     let app = adw::Application::builder()
-        .application_id("io.github.debasish-patra-1987.linuxthemestore")
+        .application_id("io.github.debasish_patra_1987.linuxthemestore")
         .build();
 
     app.connect_activate(build_ui);
