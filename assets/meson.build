@@ -1,3 +1,4 @@
+project('linuxthemestore', 'rust', version: '0.1.0')
 datadir = get_option('prefix') / get_option('datadir')
 
 application_id = 'io.github.debasishpatra1987.linuxthemestore'
@@ -15,14 +16,14 @@ desktop_file = configure_file(
   output: 'io.github.debasishpatra1987.linuxthemestore.desktop',
   configuration: {'bindir': get_option('prefix') / get_option('bindir')}
 )
-
-
 install_data(
-    '@0@.metainfo.xml'.format(application_id),
-    install_dir: datadir / 'metainfo'
+  desktop_file,
+  install_dir: join_paths(get_option('datadir'), 'applications'),
+  install_mode: ['rwxr-xr-x']
 )
 
-install_data(
-    '@0@.svg'.format(application_id),
-    install_dir: datadir / 'icons' / 'hicolor' / 'scalable' / 'apps'
+install_data('io.github.debasishpatra1987.linuxthemestore.metainfo.xml',
+  install_dir: join_paths(get_option('datadir'), 'metainfo'),
+  install_mode: ['rwxr-xr-x']
 )
+
