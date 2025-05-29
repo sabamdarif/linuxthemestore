@@ -18,15 +18,6 @@ For Arch Linux Build is available in aur..
 ```sh
 yay -S linuxthemestore-git
 ```
-Flatpak package is availabel directly to install on your system as well
-```sh
-wget https://github.com/debasish-patra-1987/linuxthemestore/raw/refs/head/main/LinusxThemeStore.flatpak -O LinuxThemeStore.flatpak
-flatpak install --user LinuxThemeStore.flatpak
-```
-## Manual Build
-```
-git clone https://github.com/debasish-patra-1987/linuxthemestore.git
-```
 ## _Binary build_
 Installation
 ```sh
@@ -37,25 +28,12 @@ meson compile -C builddir
 sudo meson install -C builddir
 ```
 Uninstall
+
 ```
 cd linuxthemestore
 cd builddir
 sudo ninja uninstall
-```
-## _Flatpak build_
-Installation
-```
-git clone https://github.com/debasish-patra-1987/linuxthemestore.git
-cd linuxthemestore
-flatpak-builder --force-clean build/ io.github.debasish-patra-1987.linuxthemestore.json
-flatpak build-export export build/
-flatpak build-bundle export io.github.debasish-patra-1987.linuxthemestore.flatpak io.github.debasish-patra-1987.linuxthemestore
-flatpak install io.github.debasish-patra-1987.linuxthemestore.flatpak
-```
-Uninstall
-```
-flatpak uninstall io.github.debasish-patra-1987.linuxthemestore 
-```
+
 ## License
 MIT
 **Free Software, Hell Yeah!**
