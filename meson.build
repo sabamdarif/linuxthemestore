@@ -9,6 +9,9 @@ subdir('assets')
 i18n = import('i18n')
 gnome = import('gnome')
 cargo = find_program('cargo', required: true)
+sources = [
+    'src/main.rs',
+]
 
 cargo_script = find_program(join_paths(meson.source_root(), 'build-aux/cargo.sh'))
 cargo_release = custom_target(
