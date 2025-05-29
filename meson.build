@@ -38,8 +38,10 @@ install_data(
   install_mode: ['rwxr-xr-x']
 )
 
-install_data('io.github.debasishpatra1987.linuxthemestore.metainfo.xml',
-  install_dir: join_paths(get_option('datadir'), 'metainfo'))
+install_data('assets/io.github.debasishpatra1987.linuxthemestore.metainfo.xml',
+  install_dir: join_paths(get_option('datadir'), 'metainfo'),
+  install_mode: ['rwxr-xr-x']
+)
 
 gnome.post_install(
     gtk_update_icon_cache: true,
