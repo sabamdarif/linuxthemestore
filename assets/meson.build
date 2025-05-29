@@ -3,11 +3,6 @@ datadir = get_option('prefix') / get_option('datadir')
 application_id = 'io.github.debasishpatra1987.linuxthemestore'
 # Read more <https://mesonbuild.com/Reference-manual.html#install_data>
 
-install_data(
-    '@0@.desktop'.format(application_id),
-    install_dir: datadir / 'applications'
-)
-
 # Install the app icon
 install_data(
   'io.github.debasishpatra1987.linuxthemestore.svg',
