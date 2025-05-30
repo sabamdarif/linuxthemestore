@@ -1,4 +1,3 @@
-project('linuxthemestore', 'rust', version: '0.1.0')
 datadir = get_option('prefix') / get_option('datadir')
 
 application_id = 'io.github.debasish_patra_1987.linuxthemestore'
