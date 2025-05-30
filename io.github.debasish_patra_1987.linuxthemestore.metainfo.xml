@@ -11,24 +11,24 @@
   <launchable type="desktop-id">io.github.debasish_patra_1987.linuxthemestore.desktop</launchable>
   <screenshots>
     <screenshot type="default">
-      <caption>Main Screen 1</caption>
-      <image>https://raw.githubusercontent.com/debasish-patra-1987/linuxthemestore/refs/heads/main/screenshots/1.png</image>
+      <caption>Loading Screen</caption>
+      <image>https://raw.githubusercontent.com/debasish-patra-1987/linuxthemestore/54807032f3e90613842d81fa2e12a8ae8655e2c2/screenshots/1.png</image>
     </screenshot>
     <screenshot type="default">
-      <caption>Main Screen 2</caption>
-      <image>https://raw.githubusercontent.com/debasish-patra-1987/linuxthemestore/refs/heads/main/screenshots/2.png</image>
+      <caption>Latest Gtk Themes</caption>
+      <image>https://raw.githubusercontent.com/debasish-patra-1987/linuxthemestore/54807032f3e90613842d81fa2e12a8ae8655e2c2/screenshots/2.png</image>
     </screenshot>
     <screenshot type="default">
-      <caption>Main Screen 3</caption>
-      <image>https://raw.githubusercontent.com/debasish-patra-1987/linuxthemestore/refs/heads/main/screenshots/3.png</image>
+      <caption>Downloading More Themes</caption>
+      <image>https://raw.githubusercontent.com/debasish-patra-1987/linuxthemestore/54807032f3e90613842d81fa2e12a8ae8655e2c2/screenshots/3.png</image>
     </screenshot>
     <screenshot type="default">
-      <caption>Main Screen 4</caption>
-      <image>https://raw.githubusercontent.com/debasish-patra-1987/linuxthemestore/refs/heads/main/screenshots/4.png</image>
+      <caption>Selected a Theme to check Variants</caption>
+      <image>https://raw.githubusercontent.com/debasish-patra-1987/linuxthemestore/54807032f3e90613842d81fa2e12a8ae8655e2c2/screenshots/4.png</image>
     </screenshot>
     <screenshot type="default">
-      <caption>Main Screen 5</caption>
-      <image>https://raw.githubusercontent.com/debasish-patra-1987/linuxthemestore/refs/heads/main/screenshots/5.png</image>
+      <caption>Theme Description</caption>
+      <image>https://raw.githubusercontent.com/debasish-patra-1987/linuxthemestore/54807032f3e90613842d81fa2e12a8ae8655e2c2/screenshots/5.png</image>
     </screenshot>
   </screenshots>
   <developer_name>Debasish Patra</developer_name>
@@ -37,13 +37,7 @@
   <update_contact>patradebasish1987@gmail.com</update_contact>
   <url type="homepage">https://github.com/debasish-patra-1987/linuxthemestore</url>
   <url type="bugtracker">https://github.com/debasish-patra-1987/linuxthemestore/issues</url>
-  <content_rating type="oars-1.1">
-    <content_attribute id="violence-cartoon">none</content_attribute>
-    <content_attribute id="violence-fantasy">none</content_attribute>
-    <content_attribute id="violence-realistic">none</content_attribute>
-    <content_attribute id="drugs-alcohol">none</content_attribute>
-    <content_attribute id="money-gambling">none</content_attribute>
-  </content_rating>
+  <content_rating type="oars-1.1"/>
   <releases>
     <release version="1.0.0" date="2025-05-28"/>
   </releases>
