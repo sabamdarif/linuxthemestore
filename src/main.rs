@@ -901,10 +901,12 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
         dialogheader.set_title_widget(Some(&header_title));
 
         let dialog_scrollbox = ScrolledWindow::builder()
-            .min_content_height(800)
-            .min_content_width(800)
-            .max_content_height(1920)
-            .max_content_width(1280)
+            .propagate_natural_width(true)
+            .propagate_natural_height(true)
+            //.min_content_height(800)
+            //.min_content_width(800)
+            //.max_content_height(1920)
+            //.max_content_width(1280)
             .hscrollbar_policy(PolicyType::Automatic)
             .margin_bottom(10)
             .margin_end(10)
@@ -1278,7 +1280,7 @@ fn build_content_box(
     window: &ApplicationWindow,
 ) {
     let themecategory_contentbox = GtkBox::new(Orientation::Vertical, 20);
-    window.set_height_request(1024);
+    //window.set_height_request(1024);
     themecategory_contentbox.set_valign(Align::Center);
     themecategory_contentbox.set_halign(Align::Center);
 
