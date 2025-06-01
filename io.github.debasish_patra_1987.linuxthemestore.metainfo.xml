@@ -9,6 +9,10 @@
     </p>
   </description>
   <launchable type="desktop-id">io.github.debasish_patra_1987.linuxthemestore.desktop</launchable>
+  <branding>
+    <color type="primary" scheme_preference="light">#ffffff</color>
+    <color type="primary" scheme_preference="dark">#1a488b</color>
+  </branding>
   <screenshots>
     <screenshot type="default">
       <caption>Loading Screen</caption>
@@ -40,6 +44,13 @@
   <content_rating type="oars-1.1"/>
   <releases>
     <release version="1.0.0" date="2025-05-28"/>
+      <description translate="no">
+        <p>Release</p>
+        <ul>
+          <li>Initial version</li>
+        </ul>
+      </description>
+    </release>
   </releases>
 </component>
 
