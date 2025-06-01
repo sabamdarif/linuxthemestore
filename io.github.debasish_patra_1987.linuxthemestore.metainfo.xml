@@ -5,7 +5,7 @@
   <summary>Browse, preview, and install desktop themes</summary>
   <description>
     <p>
-      Linux Themes Store allows users to explore and apply a wide variety of desktop themes with a clean and intuitive interface.
+      A modern desktop app for discovering, downloading, and installing Linux themes, icons, wallpapers, and more — directly from Pling and OpenDesktop.org. No browser required. Just browse, click, and beautify your desktop!
     </p>
   </description>
   <launchable type="desktop-id">io.github.debasish_patra_1987.linuxthemestore.desktop</launchable>
@@ -43,11 +43,14 @@
   <url type="bugtracker">https://github.com/debasish-patra-1987/linuxthemestore/issues</url>
   <content_rating type="oars-1.1"/>
   <releases>
-    <release version="1.0.0" date="2025-05-28"/>
+    <release version="1.0.0" date="2025-06-01"/>
       <description translate="no">
-        <p>Release</p>
+        <p>Release 1.0.0 supports</p>
         <ul>
-          <li>Initial version</li>
+          <li>Gnome Shell Themes</li>
+          <li>Gtk 3/4 Themes</li>
+          <li>Cursor Themes</li>
+          <li>Full Icon Themes</li>
         </ul>
       </description>
     </release>

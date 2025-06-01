@@ -155,7 +155,13 @@ impl<'de> Deserialize<'de> for Product {
                 });
                 match field {
                     "downloadlink" => {
-                        entry.downloadlink = value.as_str().unwrap_or_default().to_string()
+                        //.tar,.tar.xz,tar.gz.7z,.zip"
+                        println!("Download Link : {:?}",entry.downloadlink);
+                        let link = value.as_str().unwrap_or_default().to_string();
+
+                        if link.ends_with("tar") || link.ends_with("tar.xz") || link.ends_with("tar.gz") || link.ends_with("7z") || link.ends_with("zip"){
+                            entry.downloadlink = value.as_str().unwrap_or_default().to_string()
+                        }
                     }
                     "downloadname" => {
                         entry.downloadname = value.as_str().unwrap_or_default().to_string()
@@ -417,7 +423,7 @@ fn install_theme(downloaddetail: &DownloadDetail, themetype: &Catalog) -> Result
 
 fn install_tar(path: &str, theme_type: &Catalog) -> Result<()> {
     use std::process::Command;
-    println!("Before installing tihe tar file. : {}", path);
+    println!("Before installing the tar file. : {}", path);
     let mut extract_path = std::env::var("HOME").unwrap();
     match theme_type {
         Catalog::FullIconThemes | Catalog::Cursors => {
@@ -454,7 +460,12 @@ fn install_tar(path: &str, theme_type: &Catalog) -> Result<()> {
             .output()
             .expect("Failed to extract .zip file");
     } else {
-        println!("Unsupported file type. Didnt do anything...");
+        let _proc = Command::new("cp")
+            .arg(&path)
+            .arg(&extract_path)
+            .output()
+            .expect("Just copying failed");
+        println!("Unsupported file type. Just copied...");
     }
 
     //println!("{} {} Installed Sucessfully", theme_type, &path);
@@ -538,12 +549,14 @@ pub fn load_custom_css() {
                     .img-round{
                     border-top-left-radius: 12px;
                     border-top-right-radius: 12px;
+                    border-bottom: 1px solid #434343;
                     }
 
                     .img-cover{
                         border-radius: 2%;
-                        border-width: 15px;
-                        box-shadow: 0 8px 50px 0 rgba(0, 0, 0, 0.2), 0 6px 50px 0 rgba(0, 0, 0, 0.19);
+                        border-width: 2px;
+                        border-color: #434343;
+                        box-shadow: 0 8px 8px 0 rgba(0, 0, 0, 0.1), 0 6px 8px 0 rgba(0, 0, 0, 0.1);
                     }
                     "
                 );
@@ -1491,9 +1504,10 @@ fn build_ui(app: &adw::Application) {
 
         let about_dialog = AboutDialog::builder()
             .application_name("Linux Theme Store")
+            .application_icon("io.github.debasish_patra_1987.linuxthemestore")
             .developer_name("Debasish Patra")
             .version("1.0.0")
-            .license_type(License::MitX11)
+            .license_type(License::Gpl30)
             .comments("A modern desktop app for discovering, downloading, and installing Linux themes, icons, wallpapers, and more — directly from Pling and OpenDesktop.org. No browser required. Just browse, click, and beautify your desktop!")
             .build();
 
