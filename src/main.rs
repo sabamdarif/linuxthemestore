@@ -720,7 +720,6 @@ fn build_category_page(
 }
 // contentbox function
 fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &ApplicationWindow) {
-    let _ = prev_button;
     let imgpath = "/tmp/themeinstaller/cache/".to_string() + &each_product.previewpics[0];
     let img = Picture::builder()
         .valign(Align::Center)
@@ -1089,7 +1088,7 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
         let current_index = Arc::new(Mutex::new((0, total_preview_pics)));
         let previewpics = product.previewpics.clone();
         let img_prev = img.clone();
-        prev_button.connect_clicked(move |_prev_button| {
+        prev_button.connect_clicked(move |prev_button| {
             let mut curret_index_mutex = current_index.lock().unwrap();
             let (current_index, total_preview_pics) = curret_index_mutex.deref_mut();
             if *current_index == 0 {
@@ -1105,7 +1104,7 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
         let current_index = Arc::new(Mutex::new((0, total_preview_pics as i32)));
         let previewpics_next = product.previewpics.clone();
         let img_next = img.clone();
-        next_button.connect_clicked(move |_next_button| {
+        next_button.connect_clicked(move |next_button| {
             let mut curret_index_mutex = current_index.lock().unwrap();
             let (current_index, total_preview_pics) = curret_index_mutex.deref_mut();
             if *current_index == (*total_preview_pics - 1) {
@@ -1120,6 +1119,7 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
         });
 
         dialogbody.append(&imgclamp);
+
         dialog.set_child(Some(&dialogbox));
 
         let group = PreferencesGroup::builder()

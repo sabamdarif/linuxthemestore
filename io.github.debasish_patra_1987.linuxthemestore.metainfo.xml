@@ -4,9 +4,7 @@
   <name>Linux Theme Store</name>
   <summary>Browse, preview, and install desktop themes</summary>
   <description>
-    <p>
-      Linux Themes Store allows users to explore and apply a wide variety of desktop themes with a clean and intuitive interface
-    </p>
+    <p>Install desktop themes natively</p>
   </description>
   <launchable type="desktop-id">io.github.debasish_patra_1987.linuxthemestore.desktop</launchable>
   <branding>
@@ -43,7 +41,22 @@
   <url type="bugtracker">https://github.com/debasish-patra-1987/linuxthemestore/issues</url>
   <content_rating type="oars-1.1"/>
   <releases>
-    <release version="1.0.0" date="2025-05-28"/>
-  </releases>
+    <release version="1.0.1" date="2025-06-04">
+      <description>
+        <p>Performance improvements</p>
+          <ul>
+            <li>Better Image Quality for verifying themes</li>
+            <li>Quicker Pagination and page loading</li>
+            <li>UI Design improvements</li>
+            <li>Redundant Code Cleanup</li>
+          </ul>
+      </description>
+    </release>
+    <release version="1.0.0" date="2025-05-28">
+      <description>
+        <p>Initial Release</p>
+      </description>
+    </release>
+</releases>
 </component>
 
