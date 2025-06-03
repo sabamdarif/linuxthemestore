@@ -1,9 +1,10 @@
-use adw::glib::object::IsA;
+use adw::glib::object::{IsA, ObjectExt};
+use adw::glib::property::PropertyGet;
 use adw::gtk::DrawingArea;
 use adw::prelude::{ActionRowExt, AdwDialogExt, ExpanderRowExt, PreferencesGroupExt};
 use chrono::DateTime;
 use gtk4::prelude::{
-    ButtonExt, DrawingAreaExt, DrawingAreaExtManual,
+    ButtonExt, CheckButtonExt, DrawingAreaExt, DrawingAreaExtManual, FlowBoxChildExt, ListBoxRowExt,
 };
 use gtk4::{Button, ContentFit, CssProvider, GestureClick, Image, License};
 use reqwest::blocking::Client;
@@ -155,13 +156,7 @@ impl<'de> Deserialize<'de> for Product {
                 });
                 match field {
                     "downloadlink" => {
-                        //.tar,.tar.xz,tar.gz.7z,.zip"
-                        println!("Download Link : {:?}",entry.downloadlink);
-                        let link = value.as_str().unwrap_or_default().to_string();
-
-                        if link.ends_with("tar") || link.ends_with("tar.xz") || link.ends_with("tar.gz") || link.ends_with("7z") || link.ends_with("zip"){
-                            entry.downloadlink = value.as_str().unwrap_or_default().to_string()
-                        }
+                        entry.downloadlink = value.as_str().unwrap_or_default().to_string()
                     }
                     "downloadname" => {
                         entry.downloadname = value.as_str().unwrap_or_default().to_string()
@@ -398,7 +393,7 @@ fn install_theme(downloaddetail: &DownloadDetail, themetype: &Catalog) -> Result
     path.push_str(themetype.to_string());
     path.push_str("/");
 
-    let _ = fs::create_dir_all(&path.as_str());
+    let r = fs::create_dir_all(&path.as_str());
     path.push_str(&downloaddetail.downloadname);
     // Check if the file exists in cache, then skip download
     match std::path::Path::new(&path).exists() {
@@ -423,7 +418,7 @@ fn install_theme(downloaddetail: &DownloadDetail, themetype: &Catalog) -> Result
 
 fn install_tar(path: &str, theme_type: &Catalog) -> Result<()> {
     use std::process::Command;
-    println!("Before installing the tar file. : {}", path);
+    println!("Before installing tihe tar file. : {}", path);
     let mut extract_path = std::env::var("HOME").unwrap();
     match theme_type {
         Catalog::FullIconThemes | Catalog::Cursors => {
@@ -460,12 +455,7 @@ fn install_tar(path: &str, theme_type: &Catalog) -> Result<()> {
             .output()
             .expect("Failed to extract .zip file");
     } else {
-        let _proc = Command::new("cp")
-            .arg(&path)
-            .arg(&extract_path)
-            .output()
-            .expect("Just copying failed");
-        println!("Unsupported file type. Just copied...");
+        println!("Unsupported file type. Didnt do anything...");
     }
 
     //println!("{} {} Installed Sucessfully", theme_type, &path);
@@ -487,7 +477,7 @@ impl CircleRating {
         area.set_content_height(50); // Height of a circle
 
         let rating_clone = rating.clone();
-        area.set_draw_func(move |_, cr, _, height| {
+        area.set_draw_func(move |_, cr, width, height| {
             let rating = *rating_clone.borrow();
             let circle_diameter = 15.0;
             let spacing = 5.0;
@@ -549,14 +539,12 @@ pub fn load_custom_css() {
                     .img-round{
                     border-top-left-radius: 12px;
                     border-top-right-radius: 12px;
-                    border-bottom: 1px solid #434343;
                     }
 
                     .img-cover{
                         border-radius: 2%;
-                        border-width: 2px;
-                        border-color: #434343;
-                        box-shadow: 0 8px 8px 0 rgba(0, 0, 0, 0.1), 0 6px 8px 0 rgba(0, 0, 0, 0.1);
+                        border-width: 15px;
+                        box-shadow: 0 8px 50px 0 rgba(0, 0, 0, 0.2), 0 6px 50px 0 rgba(0, 0, 0, 0.19);
                     }
                     "
                 );
@@ -586,6 +574,35 @@ pub fn get_product_catalog(prodpageprops: &ProductPageProps) -> Result<ProductCa
     let resp_json_products: ProductCatalog = serde_json::from_value(res).unwrap();
     //println!("{}", serde_json::to_string_pretty(&resp_json_products).unwrap());
     Ok(resp_json_products)
+}
+
+
+fn downloadthumb(each_product: &Product) -> Result<()> {
+    //println!("Got inside Download Thumbnail");
+
+    let firstimage = match each_product.previewpics.len() {
+        0 => None,
+        _ => Some(&each_product.previewpics[0]),
+    };
+    if firstimage.is_none(){
+        return Ok(());
+    }
+    let firstimage = firstimage.unwrap();
+    let save_path = "/tmp/themeinstaller/cache/".to_string() + &firstimage;
+    if !std::path::Path::new(&save_path).exists() {
+        let mut save_dir = save_path.to_string();
+        save_dir.push_str(&firstimage);
+
+        let save_dir = &save_dir[0..save_dir.rfind('/').unwrap()];
+        let save_dir_copy = save_dir;
+        let _ = fs::create_dir_all(&save_dir_copy);
+
+        fetch_url(&firstimage.replace("770x540", "350x350"), save_path).unwrap();
+    }
+
+    Ok(())
+
+    //);
 }
 
 fn downloadthumbs(products: Vec<Product>) -> Result<()> {
@@ -694,13 +711,18 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
         .build();
     img.add_css_class("img-round");
     img.set_content_fit(ContentFit::Cover);
-    img.set_filename(Some(&std::path::Path::new(imgpath.as_str())));
+    //img.set_filename(Some(&std::path::Path::new(imgpath.as_str())));
     img.set_size_request(260, 260);
     //img.set_can_shrink(true);
     let imgclamp = Clamp::new();
-    imgclamp.set_child(Some(&img));
+    let imagespinner = Spinner::new();
+    //imgclamp.set_child(Some(&img));
+    println!("Setting SPinner");
+    imgclamp.set_child(Some(&imagespinner));
     imgclamp.set_tightening_threshold(256);
     imgclamp.set_maximum_size(256);
+
+
     let flowboxchild_button = Button::builder()
         .width_request(256)
         .css_classes(vec!["flat"])
@@ -882,6 +904,57 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
         .build();*/
 
     //lastbox4.append(&install_button);
+    // Starts
+
+            let (imagesender, imagerecv) = async_channel::unbounded::<String>();
+            //row.connect_activated(move |_| {
+            //let row_clone = row.clone();
+            let each_prod_clone = each_product.clone();
+            let each_prod_clone_arc = Arc::new(Mutex::new(each_prod_clone));
+            imagespinner.connect_realize(move |_| {
+
+                //let row  = row_clone.clone();
+                //row.remove(downloadbutton);
+                //row.add_suffix(&Spinner::new());
+                eprintln!("Inside Image Spinner connect realize!");
+
+                let sender = imagesender.clone();
+                let each_prod_clone_arc = Arc::clone(&each_prod_clone_arc);
+
+                // Run async code to get all required values for populating full icon themes
+                adw::gio::spawn_blocking(move || {
+                    let each_prod_clone_mutex = each_prod_clone_arc.lock().unwrap();
+                    let each_prod_clone = each_prod_clone_mutex.deref();
+                    println!("Before download : {:#?}", &each_prod_clone);
+
+                    let _ = downloadthumb(&each_prod_clone);
+                    println!("After download : {:#?}", &each_prod_clone);
+                    sender
+                        .send_blocking(("imgcomplete".to_string()))
+                        .unwrap_or_default();
+                    println!("After sending");
+                });
+
+                // The main loop executes the asynchronous block
+                let imagerecv_clone = imagerecv.clone();
+                let imgclamp_clone = imgclamp.clone();
+                let imgclone = img.clone();
+                let imgpath_clone = imgpath.clone();
+                glib::spawn_future_local({
+                    async move {
+                        while let Ok((message)) = imagerecv_clone.recv().await {
+                            if message.eq(&String::from("imgcomplete")) {
+                                imgclone.set_filename(Some(&std::path::Path::new(imgpath_clone.as_str())));
+                                imgclamp_clone.set_child(Some(&imgclone));
+                                println!("Set the image after download")
+                            } else {
+                            }
+                        }
+                    }
+                });
+            });
+
+    // Ends
 
     flowbox.insert(&productclamp, -1);
 
@@ -914,12 +987,10 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
         dialogheader.set_title_widget(Some(&header_title));
 
         let dialog_scrollbox = ScrolledWindow::builder()
-            .propagate_natural_width(true)
-            .propagate_natural_height(true)
-            //.min_content_height(800)
-            //.min_content_width(800)
-            //.max_content_height(1920)
-            //.max_content_width(1280)
+            .min_content_height(800)
+            .min_content_width(800)
+            .max_content_height(1920)
+            .max_content_width(1280)
             .hscrollbar_policy(PolicyType::Automatic)
             .margin_bottom(10)
             .margin_end(10)
@@ -992,7 +1063,7 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
         let current_index = Arc::new(Mutex::new((0, total_preview_pics)));
         let previewpics = product.previewpics.clone();
         let img_prev = img.clone();
-        prev_button.connect_clicked(move |_| {
+        prev_button.connect_clicked(move |prev_button| {
             let mut curret_index_mutex = current_index.lock().unwrap();
             let (current_index, total_preview_pics) = curret_index_mutex.deref_mut();
             if *current_index == 0 {
@@ -1008,7 +1079,7 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
         let current_index = Arc::new(Mutex::new((0, total_preview_pics as i32)));
         let previewpics_next = product.previewpics.clone();
         let img_next = img.clone();
-        next_button.connect_clicked(move |_| {
+        next_button.connect_clicked(move |next_button| {
             let mut curret_index_mutex = current_index.lock().unwrap();
             let (current_index, total_preview_pics) = curret_index_mutex.deref_mut();
             if *current_index == (*total_preview_pics - 1) {
@@ -1293,7 +1364,7 @@ fn build_content_box(
     window: &ApplicationWindow,
 ) {
     let themecategory_contentbox = GtkBox::new(Orientation::Vertical, 20);
-    //window.set_height_request(1024);
+    window.set_height_request(1024);
     themecategory_contentbox.set_valign(Align::Center);
     themecategory_contentbox.set_halign(Align::Center);
 
@@ -1387,7 +1458,7 @@ fn build_content_box(
             let mut productprops = productpage_mutex.deref_mut();
             productprops.set_page(productprops.pageno + 1);
             let productcatalog: ProductCatalog = get_product_catalog(&productprops).unwrap();
-            downloadthumbs(productcatalog.data.clone()).unwrap();
+            //downloadthumbs(productcatalog.data.clone()).unwrap();
             sender.send_blocking(productcatalog).unwrap_or_default();
         });
     });
@@ -1403,7 +1474,7 @@ fn build_content_box(
             let productprops = productpage.clone();
 
             let productcatalog: ProductCatalog = get_product_catalog(&productprops).unwrap();
-            downloadthumbs(productcatalog.data.clone()).unwrap();
+            //downloadthumbs(productcatalog.data.clone()).unwrap();
             sender.send_blocking(productcatalog).unwrap_or_default();
         });
     });
@@ -1439,7 +1510,7 @@ fn main() -> glib::ExitCode {
 
     // Create a new application
     let app = adw::Application::builder()
-        .application_id("io.github.debasish_patra_1987.linuxthemestore")
+        .application_id("com.ScalpelSoftwares.LinuxThemesStore")
         .build();
 
     app.connect_activate(build_ui);
@@ -1470,8 +1541,10 @@ fn build_ui(app: &adw::Application) {
     view_switcher.set_stack(Some(&view_stack));
 
     // Header Bar Setup below
+    //let header_title = adw::WindowTitle::new("Themes Installer", "Scalpel Softwares");
     header_box.set_hexpand(true);
     header_box.set_vexpand(true);
+    //header_bar.pack_start(&header_title);
     view_switcher.set_can_shrink(true);
 
     let view_switcher_box = GtkBox::new(Orientation::Horizontal, 0);
@@ -1503,17 +1576,43 @@ fn build_ui(app: &adw::Application) {
     // Connect button to show AdwAboutWindow
 
         let about_dialog = AboutDialog::builder()
-            .application_name("Linux Theme Store")
-            .application_icon("io.github.debasish_patra_1987.linuxthemestore")
+            .application_name("Linux Themes Store")
             .developer_name("Debasish Patra")
             .version("1.0.0")
-            .license_type(License::Gpl30)
+            .license_type(License::MitX11)
             .comments("A modern desktop app for discovering, downloading, and installing Linux themes, icons, wallpapers, and more — directly from Pling and OpenDesktop.org. No browser required. Just browse, click, and beautify your desktop!")
             .build();
 
         about_dialog.present(Some(&window_clone));
         });
 
+    //window.set_titlebar(Some(&header_bar));
+    // Set main content
+    /*
+        //Gtk3/4 Themes
+        build_category_page(
+            &view_stack,
+            &outer_view_stack,
+            &Catalog::Gtk4Themes,
+            &window,
+        );
+        //FullIcon Themes
+        build_category_page(
+            &view_stack,
+            &outer_view_stack,
+            &Catalog::FullIconThemes,
+            &window,
+        );
+        //GnomeShell
+        build_category_page(
+            &view_stack,
+            &outer_view_stack,
+            &Catalog::GnomeShellThemes,
+            &window,
+        );
+        //Cursor
+        build_category_page(&view_stack, &outer_view_stack, &Catalog::Cursors, &window);
+    */
     for each_catalog_type in Catalog::get_all_catalog_types() {
         build_category_page(&view_stack, &outer_view_stack, &each_catalog_type, &window);
     }
