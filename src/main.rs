@@ -597,9 +597,31 @@ fn downloadthumb(each_product: &Product) -> Result<()> {
         let save_dir_copy = save_dir;
         let _ = fs::create_dir_all(&save_dir_copy);
 
-        fetch_url(&firstimage.replace("770x540", "350x350"), save_path).unwrap();
+        fetch_url(&firstimage.replace("770x540", "770x540"), save_path).unwrap();
     }
 
+    Ok(())
+
+    //);
+}
+
+
+fn downloadotherimages(each_product: &Product) -> Result<()> {
+    //println!("Got inside Download Thumbnail");
+
+    for each_image in &each_product.previewpics[1..]{
+        let save_path = "/tmp/themeinstaller/cache/".to_string() + &each_image;
+        if !std::path::Path::new(&save_path).exists() {
+            let mut save_dir = save_path.to_string();
+            save_dir.push_str(&each_image);
+
+            let save_dir = &save_dir[0..save_dir.rfind('/').unwrap()];
+            let save_dir_copy = save_dir;
+            let _ = fs::create_dir_all(&save_dir_copy);
+
+            fetch_url(&each_image.replace("770x540", "770x540"), save_path).unwrap();
+        }
+    }
     Ok(())
 
     //);
@@ -632,7 +654,7 @@ fn downloadthumbs(products: Vec<Product>) -> Result<()> {
                     let save_dir_copy = save_dir;
                     let _ = fs::create_dir_all(&save_dir_copy);
 
-                    fetch_url(&image_small.replace("770x540", "350x350"), save_path).unwrap();
+                    fetch_url(&image_small.replace("770x540", "770x540"), save_path).unwrap();
                 }
             }
         });
@@ -698,6 +720,7 @@ fn build_category_page(
 }
 // contentbox function
 fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &ApplicationWindow) {
+    let _ = prev_button;
     let imgpath = "/tmp/themeinstaller/cache/".to_string() + &each_product.previewpics[0];
     let img = Picture::builder()
         .valign(Align::Center)
@@ -715,10 +738,12 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
     img.set_size_request(260, 260);
     //img.set_can_shrink(true);
     let imgclamp = Clamp::new();
-    let imagespinner = Spinner::new();
+    let imagespinner = Spinner::builder().valign(Align::Center).halign(Align::Center).hexpand(true).vexpand(true).width_request(32).height_request(32).build();
+    let imagebox = GtkBox::builder().valign(Align::Center).halign(Align::Center).hexpand(true).vexpand(true).height_request(260).width_request(260).build();
+    imagebox.append(&imagespinner);
     //imgclamp.set_child(Some(&img));
     println!("Setting SPinner");
-    imgclamp.set_child(Some(&imagespinner));
+    imgclamp.set_child(Some(&imagebox));
     imgclamp.set_tightening_threshold(256);
     imgclamp.set_maximum_size(256);
 
@@ -933,6 +958,7 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
                         .send_blocking(("imgcomplete".to_string()))
                         .unwrap_or_default();
                     println!("After sending");
+                    downloadotherimages(&each_prod_clone).unwrap_or_default();
                 });
 
                 // The main loop executes the asynchronous block
@@ -1063,7 +1089,7 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
         let current_index = Arc::new(Mutex::new((0, total_preview_pics)));
         let previewpics = product.previewpics.clone();
         let img_prev = img.clone();
-        prev_button.connect_clicked(move |prev_button| {
+        prev_button.connect_clicked(move |_prev_button| {
             let mut curret_index_mutex = current_index.lock().unwrap();
             let (current_index, total_preview_pics) = curret_index_mutex.deref_mut();
             if *current_index == 0 {
@@ -1079,7 +1105,7 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
         let current_index = Arc::new(Mutex::new((0, total_preview_pics as i32)));
         let previewpics_next = product.previewpics.clone();
         let img_next = img.clone();
-        next_button.connect_clicked(move |next_button| {
+        next_button.connect_clicked(move |_next_button| {
             let mut curret_index_mutex = current_index.lock().unwrap();
             let (current_index, total_preview_pics) = curret_index_mutex.deref_mut();
             if *current_index == (*total_preview_pics - 1) {
@@ -1094,32 +1120,14 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
         });
 
         dialogbody.append(&imgclamp);
-        //dialog.set_default_widget(default_widget);
         dialog.set_child(Some(&dialogbox));
 
         let group = PreferencesGroup::builder()
             .title("Select Variants to Download")
             .build();
 
-        // Create a ListBox
-        /*
-                           let listbox = ListBox::builder()
-                                       .margin_top(32)
-                                       .margin_end(32)
-                                       .margin_bottom(32)
-                                       .margin_start(32)
-                                       //.orientation(Orientation::Vertical)
-                                       //.selection_mode(SelectionMode::Single)
-                                       // makes the list look nicer
-                                       .css_classes(vec![String::from("boxed-list")])
-                                       .build();
-        */
         for each_variant in &product.downloaddetails {
-            /*
-                                downloadlink: String,
-            pub downloadname: String,
-            pub downloadsize: u64,
-                                 */
+
             let downloadsize_in_mb =
                 ((each_variant.downloadsize as f32) / 100.0).to_string() + " Mb";
             let row: ActionRow = ActionRow::builder()
@@ -1130,7 +1138,7 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
                 .build();
             let downloadbutton = Button::builder()
                 .css_classes(vec!["pill1"])
-                .label("Install")
+                .icon_name("browser-download-symbolic")
                 .margin_bottom(10)
                 .margin_top(10)
                 .sensitive(true)
@@ -1140,12 +1148,8 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
             let catalogtype = Catalog::id_to_catalog(&product.typeid.to_string().as_str());
 
             let (senderdownload, receiverdownload) = async_channel::unbounded::<String>();
-            //row.connect_activated(move |_| {
-            //let row_clone = row.clone();
             downloadbutton.connect_clicked(move |downloadbutton| {
-                //let row  = row_clone.clone();
-                //row.remove(downloadbutton);
-                //row.add_suffix(&Spinner::new());
+
                 downloadbutton.set_child(Some(&Spinner::new()));
                 eprintln!("Clicked!");
 
@@ -1169,7 +1173,8 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
                     async move {
                         while let Ok(message) = receiverdownload_clone.recv().await {
                             if message.eq(&String::from("downloaded")) {
-                                downloadbutton_clone.set_label("Installed");
+                                downloadbutton_clone.set_icon_name("ephy-download-done-symbolic");
+                                downloadbutton_clone.set_sensitive(false);
                             } else {
                             }
                         }
@@ -1179,8 +1184,6 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
             group.add(&row);
         }
         // Add the ListBox to the dialog
-        //dialog.set_child(Some(&dialogheader));
-        //dialogheader.set_title_widget(Some(&dialogbody));
         let productbox = GtkBox::new(Orientation::Vertical, 5);
         dialogbody.append(&productbox);
 
@@ -1188,17 +1191,12 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
             .width_request(500)
             .orientation(Orientation::Vertical)
             .halign(Align::Fill)
-            //.selection_mode(SelectionMode::None)
-            // makes the list look nicer
-            //.css_classes(vec!["card"])
             .build();
 
         let productlistrow = GtkBox::builder()
             .width_request(500)
             .orientation(Orientation::Horizontal)
             .halign(Align::Fill)
-            //.selection_mode(SelectionMode::None)
-            // makes the list look nicer
             .css_classes(vec!["card"])
             .build();
 
@@ -1208,7 +1206,6 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
                 .title("Product Name")
                 .subtitle(&product.name)
                 .halign(Align::Start)
-                //.css_name("card")
                 .build(),
         );
 
@@ -1218,7 +1215,6 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
                 .title("Theme Type")
                 .halign(Align::End)
                 .subtitle(&product.typename)
-                //.css_name("card")
                 .build(),
         );
 
@@ -1228,8 +1224,6 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
             .orientation(Orientation::Horizontal)
             .halign(Align::Baseline)
             .width_request(500)
-            //.selection_mode(SelectionMode::None)
-            // makes the list look nicer
             .css_classes(vec!["card"])
             .build();
 
@@ -1239,7 +1233,6 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
                 .title("Downloads")
                 .halign(Align::Baseline)
                 .subtitle(&product.downloads)
-                //.css_name("card")
                 .build(),
         );
 
@@ -1249,7 +1242,6 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
                 .title("Updated By")
                 .halign(Align::Baseline)
                 .subtitle(&product.personid)
-                //.css_name("card")
                 .build(),
         );
 
@@ -1259,8 +1251,6 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
             .width_request(500)
             .orientation(Orientation::Horizontal)
             .halign(Align::Fill)
-            //.selection_mode(SelectionMode::None)
-            // makes the list look nicer
             .css_classes(vec!["card"])
             .build();
 
@@ -1270,7 +1260,6 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
                 .title("Created On")
                 .halign(Align::Start)
                 .subtitle(get_formatted_date(&product.created))
-                //.css_name("card")
                 .build(),
         );
 
@@ -1280,7 +1269,6 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
                 .title("Updated On")
                 .halign(Align::Fill)
                 .subtitle(get_formatted_date(&product.changed))
-                //.css_name("card")
                 .build(),
         );
 
@@ -1295,7 +1283,6 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
             .margin_bottom(0)
             .margin_start(0)
             .width_request(500)
-            //.expandable(true)
             .build();
 
         // Content to show when expanded
@@ -1307,7 +1294,7 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
             .margin_top(5)
             .margin_start(10)
             .build();
-        //expander_box.set_margin_top(0);
+
         expander_box.append(
             &Label::builder()
                 .label(&product.description)
@@ -1316,28 +1303,19 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
                 .build(),
         );
 
-        //let expander_scrollbox = ScrolledWindow::builder().hscrollbar_policy(PolicyType::Automatic).margin_bottom(5).margin_end(5).margin_top(5).margin_start(10).vscrollbar_policy(PolicyType::Automatic).halign(Align::Start).valign(Align::Start).build();
-        //expander_scrollbox.set_child(Some(&Label::builder().label(&product.description).wrap(true).css_classes(vec!["caption","dimmed"]).build()));
-        //expander_box.append(&expander_scrollbox);
-        //expander_box.append(&Label::new(Some("Additional setting 2")));
-
         descriptionrow.add_row(&expander_box);
 
-        //dialogbody.append(&descriptionrow);
         let descriptionlistrow = ListBox::builder()
             .margin_top(32)
             .margin_end(32)
             .margin_bottom(32)
             .margin_start(32)
-            //.orientation(Orientation::Vertical)
             .selection_mode(SelectionMode::None)
-            // makes the list look nicer
             .css_classes(vec![String::from("boxed-list")])
             .build();
 
         descriptionlistrow.append(&descriptionrow);
 
-        //productbox.append(&adw::Clamp::builder().child(&productlistbox).maximum_size(500).build());
         productbox.append(
             &adw::Clamp::builder()
                 .child(&group)
@@ -1350,11 +1328,6 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
                 .maximum_size(500)
                 .build(),
         );
-        /*
-                            productbox.append(&Label::builder().label("Description").margin_start(15).vexpand(true).valign(Align::Start).build());
-                            productbox.append(&ScrolledWindow::builder().vscrollbar_policy(PolicyType::Automatic).margin_start(15).margin_end(15).child(&Label::builder().label(&product.description).margin_start(15).margin_top(1).vexpand(false).hexpand(true).valign(Align::Start).css_classes(vec!["dimmed",""]).build()).build());
-        */
-        //dialogbody.append(&Button::builder().vexpand(false).hexpand(false).margin_bottom(20).margin_end(40).margin_start(40).margin_top(10).label("Install Selected").css_classes(vec!["pill"]).build());
         dialog.present(Some(&window_clone));
     });
 }
@@ -1395,7 +1368,6 @@ fn build_content_box(
     //contentpage.set_css_classes(&vec!["card"]);
 
     let flowbox = FlowBox::builder()
-        //.css_classes(vec![String::from("card")])
         .build();
     flowbox.set_vexpand(true);
     flowbox.set_hexpand(true);
@@ -1415,8 +1387,6 @@ fn build_content_box(
 
     contentpage.append(&scrollwindow);
     let loadmorebox = Button::builder()
-        //.title("Load More")
-        //.activatable(true)
         .child(&Image::from_icon_name("go-down-symbolic"))
         .hexpand(true)
         .vexpand(true)
@@ -1530,8 +1500,6 @@ fn build_ui(app: &adw::Application) {
     // View Switcher
     let view_switcher = adw::InlineViewSwitcher::new();
     view_switcher.add_css_class("round");
-    //view_switcher.add_css_class("flat");
-    //vie_switcher.
 
     // View Stack
     let view_stack = adw::ViewStack::new();
@@ -1541,10 +1509,8 @@ fn build_ui(app: &adw::Application) {
     view_switcher.set_stack(Some(&view_stack));
 
     // Header Bar Setup below
-    //let header_title = adw::WindowTitle::new("Themes Installer", "Scalpel Softwares");
     header_box.set_hexpand(true);
     header_box.set_vexpand(true);
-    //header_bar.pack_start(&header_title);
     view_switcher.set_can_shrink(true);
 
     let view_switcher_box = GtkBox::new(Orientation::Horizontal, 0);
@@ -1566,53 +1532,24 @@ fn build_ui(app: &adw::Application) {
         .default_height(1080)
         .build();
 
-    // Add About in the header bar starts
-    // Create the About button
-    let about_button = Button::from_icon_name("open-menu-symbolic"); //"help-about-symbolic");
+    let about_button = Button::from_icon_name("info-outline-symbolic");
     header_bar.pack_end(&about_button);
 
     let window_clone = window.clone();
     about_button.connect_clicked(move |_|{
-    // Connect button to show AdwAboutWindow
 
         let about_dialog = AboutDialog::builder()
-            .application_name("Linux Themes Store")
+            .application_name("Linux Theme Store")
             .developer_name("Debasish Patra")
-            .version("1.0.0")
-            .license_type(License::MitX11)
-            .comments("A modern desktop app for discovering, downloading, and installing Linux themes, icons, wallpapers, and more — directly from Pling and OpenDesktop.org. No browser required. Just browse, click, and beautify your desktop!")
+            .application_icon("io.github.debasish_patra_1987.linuxthemestore")
+            .version("1.0.1")
+            .license_type(License::Gpl30)
+            .comments("Download and Install Desktop Themes")
             .build();
 
         about_dialog.present(Some(&window_clone));
         });
 
-    //window.set_titlebar(Some(&header_bar));
-    // Set main content
-    /*
-        //Gtk3/4 Themes
-        build_category_page(
-            &view_stack,
-            &outer_view_stack,
-            &Catalog::Gtk4Themes,
-            &window,
-        );
-        //FullIcon Themes
-        build_category_page(
-            &view_stack,
-            &outer_view_stack,
-            &Catalog::FullIconThemes,
-            &window,
-        );
-        //GnomeShell
-        build_category_page(
-            &view_stack,
-            &outer_view_stack,
-            &Catalog::GnomeShellThemes,
-            &window,
-        );
-        //Cursor
-        build_category_page(&view_stack, &outer_view_stack, &Catalog::Cursors, &window);
-    */
     for each_catalog_type in Catalog::get_all_catalog_types() {
         build_category_page(&view_stack, &outer_view_stack, &each_catalog_type, &window);
     }
