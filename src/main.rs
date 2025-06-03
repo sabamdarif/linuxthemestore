@@ -1365,8 +1365,8 @@ fn build_content_box(
 
     let (sender, receiver) = async_channel::unbounded::<ProductCatalog>();
     let (loadmoresender, loadmorereceiver) = async_channel::unbounded::<ProductCatalog>();
-
-    let productpage_clone = productpage.clone();
+    let productpage_ref = Arc::new(Mutex::new(productpage.clone()));
+    let loadmore_productpage_ref = Arc::clone(&productpage_ref);
     loadmorebox.connect_clicked(move |loadmorebox| {
         loadmorebox.set_sensitive(false);
         loadmorebox.set_child(Some(
@@ -1375,28 +1375,28 @@ fn build_content_box(
                 .width_request(24)
                 .build(),
         ));
-        let productpage_ref = Arc::new(Mutex::new(productpage_clone.clone()));
+
         //println!("_contentbox widget has been realized");
         let sender = loadmoresender.clone();
+        let loadmore_productpage_ref = loadmore_productpage_ref.clone();
+
 
         // Run async code to get all required values for populating full icon themes
         adw::gio::spawn_blocking(move || {
-            let productpage_mutex = productpage_ref.lock().unwrap();
-            let productpage = productpage_mutex.deref();
-            let mut productprops = productpage.clone();
-            productprops.set_page(&productprops.pageno + 1);
+            let mut productpage_mutex = loadmore_productpage_ref.lock().unwrap();
+            let mut productprops = productpage_mutex.deref_mut();
+            productprops.set_page(productprops.pageno + 1);
             let productcatalog: ProductCatalog = get_product_catalog(&productprops).unwrap();
             downloadthumbs(productcatalog.data.clone()).unwrap();
             sender.send_blocking(productcatalog).unwrap_or_default();
         });
     });
-
-    let productpage_clone = productpage.clone();
+    let contentbox_productpage_ref = Arc::clone(&productpage_ref);
     themecategory_contentbox.connect_realize(move |_contentbox| {
-        let productpage_ref = Arc::new(Mutex::new(productpage_clone.clone()));
         //println!("_contentbox widget has been realized");
         let sender = sender.clone();
-        // Run async code to get all required values for populating full icon themes
+        let productpage_ref = Arc::clone(&contentbox_productpage_ref);
+        // Run async code to get all required values for populating themes
         adw::gio::spawn_blocking(move || {
             let productpage_mutex = productpage_ref.lock().unwrap();
             let productpage = productpage_mutex.deref();
