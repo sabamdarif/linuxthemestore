@@ -13,24 +13,20 @@
   </branding>
   <screenshots>
     <screenshot type="default">
-      <caption>Loading Screen</caption>
-      <image>https://raw.githubusercontent.com/debasish-patra-1987/linuxthemestore/54807032f3e90613842d81fa2e12a8ae8655e2c2/screenshots/1.png</image>
+      <caption>Light Mode</caption>
+      <image>https://raw.githubusercontent.com/debasish-patra-1987/linuxthemestore/5ddc564b1da7757431489d62c06bce76865dd695/screenshots/1.png</image>
     </screenshot>
     <screenshot type="default">
-      <caption>Latest Gtk Themes</caption>
-      <image>https://raw.githubusercontent.com/debasish-patra-1987/linuxthemestore/54807032f3e90613842d81fa2e12a8ae8655e2c2/screenshots/2.png</image>
+      <caption>Light Mode Detailed</caption>
+      <image>https://raw.githubusercontent.com/debasish-patra-1987/linuxthemestore/5ddc564b1da7757431489d62c06bce76865dd695/screenshots/2.png</image>
     </screenshot>
     <screenshot type="default">
-      <caption>Downloading More Themes</caption>
-      <image>https://raw.githubusercontent.com/debasish-patra-1987/linuxthemestore/54807032f3e90613842d81fa2e12a8ae8655e2c2/screenshots/3.png</image>
+      <caption>Dark Mode</caption>
+      <image>https://raw.githubusercontent.com/debasish-patra-1987/linuxthemestore/5ddc564b1da7757431489d62c06bce76865dd695/screenshots/3.png</image>
     </screenshot>
     <screenshot type="default">
-      <caption>Selected a Theme to check Variants</caption>
-      <image>https://raw.githubusercontent.com/debasish-patra-1987/linuxthemestore/54807032f3e90613842d81fa2e12a8ae8655e2c2/screenshots/4.png</image>
-    </screenshot>
-    <screenshot type="default">
-      <caption>Theme Description</caption>
-      <image>https://raw.githubusercontent.com/debasish-patra-1987/linuxthemestore/54807032f3e90613842d81fa2e12a8ae8655e2c2/screenshots/5.png</image>
+      <caption>Dark Mode Detailed</caption>
+      <image>https://raw.githubusercontent.com/debasish-patra-1987/linuxthemestore/5ddc564b1da7757431489d62c06bce76865dd695/screenshots/4.png</image>
     </screenshot>
   </screenshots>
   <developer_name>Debasish Patra</developer_name>
