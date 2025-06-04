@@ -414,49 +414,50 @@ fn install_theme(downloaddetail: &DownloadDetail, themetype: &Catalog) -> Result
     Ok(())
 }
 
+use std::path::PathBuf;
+use std::process::Command;
+
 fn install_tar(path: &str, theme_type: &Catalog) -> Result<()> {
-    use std::process::Command;
-    //println!("Before installing tihe tar file. : {}", path);
-    let mut extract_path = std::env::var("HOME").unwrap();
+    // Construct the target extraction path
+    let home_dir = std::env::var("HOME")?;
+    let mut extract_path = PathBuf::from(home_dir);
+
     match theme_type {
         Catalog::FullIconThemes | Catalog::Cursors => {
-            extract_path.push_str("/.local/share/icons/");
+            extract_path.push(".local/share/icons");
         }
         Catalog::Gtk4Themes | Catalog::GnomeShellThemes => {
-            extract_path.push_str("/.local/share/themes/");
+            extract_path.push(".local/share/themes");
         }
     }
-    //println!("Extracting Tar file : {} \nPath : {}", path, extract_path);
+
+    fs::create_dir_all(&extract_path)?;
+
     if path.ends_with(".tar") || path.ends_with(".tar.xz") || path.ends_with(".tar.gz") {
-        let _proc = Command::new("tar")
+        Command::new("tar")
             .arg("-xf")
             .arg(&path)
             .arg("-C")
             .arg(&extract_path)
             .output()
-            .expect("Failed to extract .tar/.tar.xz/.tar.gz not found");
+            .expect("Failed to extract .tar/.tar.xz/.tar.gz");
     } else if path.ends_with(".7z") {
-        //7z x <file_name>.tar.7z -opath
-        let _proc = Command::new("7z")
+        Command::new("7z")
             .arg("x")
             .arg(&path)
-            .arg(format!("-o{}", &extract_path))
-            //.arg(&extract_path)
+            .arg(format!("-o{}", extract_path.display()))
             .output()
-            .expect("Failed to extract .7z file");
+            .expect("Failed to extract .7z");
     } else if path.ends_with(".zip") {
-        //unzip file.zip -d destination_folder
-        let _proc = Command::new("unzip")
+        Command::new("unzip")
             .arg(&path)
             .arg("-d")
             .arg(&extract_path)
             .output()
-            .expect("Failed to extract .zip file");
+            .expect("Failed to extract .zip");
     } else {
-        println!("Unsupported file type. Didnt do anything...");
+        println!("Unsupported file type: {}", path);
     }
-
-    //println!("{} {} Installed Sucessfully", theme_type, &path);
 
     Ok(())
 }
