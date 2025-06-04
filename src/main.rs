@@ -1114,7 +1114,7 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
                 .build();
             let downloadbutton = Button::builder()
                 .css_classes(vec!["pill1"])
-                .icon_name("browser-download-symbolic")
+                .icon_name("document-save-symbolic")
                 .margin_bottom(10)
                 .margin_top(10)
                 .sensitive(true)
@@ -1508,7 +1508,7 @@ fn build_ui(app: &adw::Application) {
         .default_height(1080)
         .build();
 
-    let about_button = Button::from_icon_name("info-outline-symbolic");
+    let about_button = Button::from_icon_name("dialog-information-symbolic");
     header_bar.pack_end(&about_button);
 
     let window_clone = window.clone();
