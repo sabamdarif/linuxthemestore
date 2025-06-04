@@ -1541,6 +1541,7 @@ fn build_ui(app: &adw::Application) {
         let about_dialog = AboutDialog::builder()
             .application_name("Linux Theme Store")
             .developer_name("Debasish Patra")
+            .application_icon("io.github.debasish_patra_1987.linuxthemestore")
             .version("1.0.1")
             .license_type(License::Gpl30)
             .comments("Download and Install Desktop Themes")
