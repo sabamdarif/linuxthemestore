@@ -1,11 +1,9 @@
-use adw::glib::object::{IsA, ObjectExt};
-use adw::glib::property::PropertyGet;
+use adw::glib::object::IsA;
 use adw::gtk::DrawingArea;
 use adw::prelude::{ActionRowExt, AdwDialogExt, ExpanderRowExt, PreferencesGroupExt};
 use chrono::DateTime;
 use gtk4::prelude::{
-    ButtonExt, CheckButtonExt, DrawingAreaExt, DrawingAreaExtManual, FlowBoxChildExt, ListBoxRowExt,
-};
+    ButtonExt, DrawingAreaExt, DrawingAreaExtManual};
 use gtk4::{Button, ContentFit, CssProvider, GestureClick, Image, License};
 use reqwest::blocking::Client;
 use serde::de::Deserializer;
@@ -393,32 +391,32 @@ fn install_theme(downloaddetail: &DownloadDetail, themetype: &Catalog) -> Result
     path.push_str(themetype.to_string());
     path.push_str("/");
 
-    let r = fs::create_dir_all(&path.as_str());
+    let _ = fs::create_dir_all(&path.as_str());
     path.push_str(&downloaddetail.downloadname);
     // Check if the file exists in cache, then skip download
     match std::path::Path::new(&path).exists() {
         true => {
-            println!("File exists in cache : {} ", &path);
+            //println!("File exists in cache : {} ", &path);
         }
         false => {
             let _res = fetch_url(&downloaddetail.downloadlink, path.clone());
         }
     }
-    println!("File Downloaded. Going to install the file...");
+    //println!("File Downloaded. Going to install the file...");
     let _ = install_tar(
         &path.clone(),
         //&dndlink.ftype.clone(),
         &themetype,
     )
     .unwrap();
-    println!("File Installed : {}", &path.clone());
+    //println!("File Installed : {}", &path.clone());
 
     Ok(())
 }
 
 fn install_tar(path: &str, theme_type: &Catalog) -> Result<()> {
     use std::process::Command;
-    println!("Before installing tihe tar file. : {}", path);
+    //println!("Before installing tihe tar file. : {}", path);
     let mut extract_path = std::env::var("HOME").unwrap();
     match theme_type {
         Catalog::FullIconThemes | Catalog::Cursors => {
@@ -477,7 +475,7 @@ impl CircleRating {
         area.set_content_height(50); // Height of a circle
 
         let rating_clone = rating.clone();
-        area.set_draw_func(move |_, cr, width, height| {
+        area.set_draw_func(move |_, cr, _, height| {
             let rating = *rating_clone.borrow();
             let circle_diameter = 15.0;
             let spacing = 5.0;
@@ -627,7 +625,7 @@ fn downloadotherimages(each_product: &Product) -> Result<()> {
     //);
 }
 
-fn downloadthumbs(products: Vec<Product>) -> Result<()> {
+fn _downloadthumbs(products: Vec<Product>) -> Result<()> {
     //println!("Got inside Download Thumbnail");
 
     let mut handles = vec![];
@@ -741,7 +739,7 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
     let imagebox = GtkBox::builder().valign(Align::Center).halign(Align::Center).hexpand(true).vexpand(true).height_request(260).width_request(260).build();
     imagebox.append(&imagespinner);
     //imgclamp.set_child(Some(&img));
-    println!("Setting SPinner");
+    //println!("Setting SPinner");
     imgclamp.set_child(Some(&imagebox));
     imgclamp.set_tightening_threshold(256);
     imgclamp.set_maximum_size(256);
@@ -911,73 +909,52 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
     lastbox4.set_hexpand(true);
     lastbox4.set_vexpand(true);
 
-    /*let install_button = Button::builder()
-    //.title("Load More")
-        //.activatable(true)
-        .label("Install")
-        .hexpand(true)
-        .vexpand(true)
-        .halign(Align::Center)
-        .valign(Align::Center)
-        .margin_bottom(10)
-        .margin_start(10)
-        .margin_top(10)
-        .margin_end(10)
-        //.css_classes(vec!["1pill","1flat","suggested-action"])
-        .width_request(250)
-        .build();*/
-
-    //lastbox4.append(&install_button);
     // Starts
 
-            let (imagesender, imagerecv) = async_channel::unbounded::<String>();
-            //row.connect_activated(move |_| {
-            //let row_clone = row.clone();
-            let each_prod_clone = each_product.clone();
-            let each_prod_clone_arc = Arc::new(Mutex::new(each_prod_clone));
-            imagespinner.connect_realize(move |_| {
+        let (imagesender, imagerecv) = async_channel::unbounded::<String>();
 
-                //let row  = row_clone.clone();
-                //row.remove(downloadbutton);
-                //row.add_suffix(&Spinner::new());
-                eprintln!("Inside Image Spinner connect realize!");
+        let each_prod_clone = each_product.clone();
+        let each_prod_clone_arc = Arc::new(Mutex::new(each_prod_clone));
+        imagespinner.connect_realize(move |_| {
 
-                let sender = imagesender.clone();
-                let each_prod_clone_arc = Arc::clone(&each_prod_clone_arc);
+        //eprintln!("Inside Image Spinner connect realize!");
 
-                // Run async code to get all required values for populating full icon themes
-                adw::gio::spawn_blocking(move || {
-                    let each_prod_clone_mutex = each_prod_clone_arc.lock().unwrap();
-                    let each_prod_clone = each_prod_clone_mutex.deref();
-                    println!("Before download : {:#?}", &each_prod_clone);
+        let sender = imagesender.clone();
+        let each_prod_clone_arc = Arc::clone(&each_prod_clone_arc);
 
-                    let _ = downloadthumb(&each_prod_clone);
-                    println!("After download : {:#?}", &each_prod_clone);
-                    sender
-                        .send_blocking(("imgcomplete".to_string()))
-                        .unwrap_or_default();
-                    println!("After sending");
-                    downloadotherimages(&each_prod_clone).unwrap_or_default();
-                });
+        // Run async code to get all required values for populating full icon themes
+        adw::gio::spawn_blocking(move || {
+            let each_prod_clone_mutex = each_prod_clone_arc.lock().unwrap();
+            let each_prod_clone = each_prod_clone_mutex.deref();
+            //println!("Before download : {:#?}", &each_prod_clone);
 
-                // The main loop executes the asynchronous block
-                let imagerecv_clone = imagerecv.clone();
-                let imgclamp_clone = imgclamp.clone();
-                let imgclone = img.clone();
-                let imgpath_clone = imgpath.clone();
-                glib::spawn_future_local({
-                    async move {
-                        while let Ok((message)) = imagerecv_clone.recv().await {
-                            if message.eq(&String::from("imgcomplete")) {
-                                imgclone.set_filename(Some(&std::path::Path::new(imgpath_clone.as_str())));
-                                imgclamp_clone.set_child(Some(&imgclone));
-                                println!("Set the image after download")
-                            } else {
-                            }
-                        }
+            let _ = downloadthumb(&each_prod_clone);
+            //println!("After download : {:#?}", &each_prod_clone);
+            sender
+                .send_blocking(String::from("imgcomplete"))
+                .unwrap_or_default();
+            //println!("After sending");
+            downloadotherimages(&each_prod_clone).unwrap_or_default();
+        });
+
+        // The main loop executes the asynchronous block
+        let imagerecv_clone = imagerecv.clone();
+        let imgclamp_clone = imgclamp.clone();
+        let imgclone = img.clone();
+        let imgpath_clone = imgpath.clone();
+        glib::spawn_future_local({
+            async move {
+                while let Ok(message) = imagerecv_clone.recv().await {
+                    if message.eq(&String::from("imgcomplete")) {
+                        imgclone.set_filename(Some(&std::path::Path::new(imgpath_clone.as_str())));
+                        imgclamp_clone.set_child(Some(&imgclone));
+                        //println!("Set the image after download")
+                    } else {
                     }
-                });
-            });
+                }
+            }
+        });
+    });
 
     // Ends
 
@@ -989,7 +966,7 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
     flowboxchild.add_controller(ges_click.clone());
     //ges_click.connect_pressed(move |_, _, _, _| {
     flowboxchild_button.connect_clicked(move |_| {
-        println!("clicked");
+        //println!("clicked");
 
         let dialog = adw::PreferencesDialog::builder()
             .can_close(true)
@@ -1012,10 +989,8 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
         dialogheader.set_title_widget(Some(&header_title));
 
         let dialog_scrollbox = ScrolledWindow::builder()
-            .min_content_height(800)
-            .min_content_width(800)
-            .max_content_height(1920)
-            .max_content_width(1280)
+            .propagate_natural_height(true)
+            .propagate_natural_width(true)
             .hscrollbar_policy(PolicyType::Automatic)
             .margin_bottom(10)
             .margin_end(10)
@@ -1088,7 +1063,7 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
         let current_index = Arc::new(Mutex::new((0, total_preview_pics)));
         let previewpics = product.previewpics.clone();
         let img_prev = img.clone();
-        prev_button.connect_clicked(move |prev_button| {
+        prev_button.connect_clicked(move |_prev_button| {
             let mut curret_index_mutex = current_index.lock().unwrap();
             let (current_index, total_preview_pics) = curret_index_mutex.deref_mut();
             if *current_index == 0 {
@@ -1104,7 +1079,7 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
         let current_index = Arc::new(Mutex::new((0, total_preview_pics as i32)));
         let previewpics_next = product.previewpics.clone();
         let img_next = img.clone();
-        next_button.connect_clicked(move |next_button| {
+        next_button.connect_clicked(move |_next_button| {
             let mut curret_index_mutex = current_index.lock().unwrap();
             let (current_index, total_preview_pics) = curret_index_mutex.deref_mut();
             if *current_index == (*total_preview_pics - 1) {
@@ -1337,7 +1312,7 @@ fn build_content_box(
     window: &ApplicationWindow,
 ) {
     let themecategory_contentbox = GtkBox::new(Orientation::Vertical, 20);
-    window.set_height_request(1024);
+    //window.set_height_request(1024);
     themecategory_contentbox.set_valign(Align::Center);
     themecategory_contentbox.set_halign(Align::Center);
 
@@ -1425,7 +1400,7 @@ fn build_content_box(
         // Run async code to get all required values for populating full icon themes
         adw::gio::spawn_blocking(move || {
             let mut productpage_mutex = loadmore_productpage_ref.lock().unwrap();
-            let mut productprops = productpage_mutex.deref_mut();
+            let productprops = productpage_mutex.deref_mut();
             productprops.set_page(productprops.pageno + 1);
             let productcatalog: ProductCatalog = get_product_catalog(&productprops).unwrap();
             //downloadthumbs(productcatalog.data.clone()).unwrap();
