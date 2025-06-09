@@ -80,26 +80,16 @@ impl<'de> Deserialize<'de> for Product {
         D: Deserializer<'de>,
     {
         fn strip_html(source: &str) -> String {
-            let mut data = String::new();
             let mut inside = false;
-            // Step 1: loop over string chars.
-            for c in source.chars() {
-                // Step 2: detect markup start and end, and skip over markup chars.
-                if c == '<' {
-                    inside = true;
-                    continue;
-                }
-                if c == '>' {
-                    inside = false;
-                    continue;
-                }
-                if !inside {
-                    // Step 3: push other characters to the result string.
-                    data.push(c);
-                }
-            }
-            // Step 4: return string.
-            return data;
+            source.chars()
+                .filter(|&c| {
+                    match c {
+                        '<' => { inside = true; false },
+                        '>' => { inside = false; false },
+                        _ => !inside,
+                    }
+                })
+                .collect()
         }
 
         fn split_field(key: &str) -> Option<(&str, usize)> {
@@ -356,7 +346,7 @@ impl SearchPageProps {
         //Point { x: 0, y: 0 }
         SearchPageProps {
             query: search_text,
-            pagesize: 10,
+            pagesize: 30,
         }
     }
 
@@ -569,9 +559,20 @@ pub fn load_custom_css() {
                     .img-cover{
                         border-radius: 2%;
                         border-width: 15px;
-                        box-shadow: 0 8px 50px 0 rgba(0, 0, 0, 0.2), 0 6px 50px 0 rgba(0, 0, 0, 0.19);
+                        box-shadow: 0 8px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 8px 0 rgba(0, 0, 0, 0.1);
+                    }
+                    .blur{
+                        filter: blur(1px);
+                        -webkit-filter: blur(1px);
+                    }
+                    .card {
+                        box-shadow: 0 8px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 8px 0 rgba(0, 0, 0, 0.1);
+                    }
+                    button:hover {
+                        transform: scale(1.01); /* 120% zoom */
                     }
                     "
+
                 );
     //.unwrap();
 
@@ -728,7 +729,7 @@ fn build_category_page(
     );
 
     let themecategorysortbybutton = adw::InlineViewSwitcher::new();
-    themecategorysortbybutton.add_css_class("round");
+    //themecategorysortbybutton.add_css_class("round");
     themecategorysortbybutton.set_can_shrink(true);
 
     let themecategorysortby_view_stack = adw::ViewStack::new();
@@ -775,10 +776,10 @@ fn build_search_page(
         view_stack.add_titled(&searchbox, Some("Search Themes"), "Search Themes");
 
     let searchinput = SearchEntry::new();
-    searchinput.set_search_delay(1000);
-    searchinput.set_placeholder_text(Some("e.g. Papirus"));
+    searchinput.set_search_delay(500);
+    searchinput.set_placeholder_text(Some("e.g. Papirus Theme"));
 
-    searchinput.add_css_class("round");
+    //searchinput.add_css_class("round");
 
     searchbox.set_valign(Align::Fill);
     searchbox.set_halign(Align::Fill);
@@ -1586,6 +1587,12 @@ fn build_search_content_box(
     flowbox.set_max_children_per_line(5);
     flowbox.set_selection_mode(SelectionMode::None);
     flowbox.set_css_classes(&vec!["suggested-action"]);
+    let flowboxrevealer = adw::gtk::Revealer::new();
+        flowboxrevealer.set_transition_type(adw::gtk::RevealerTransitionType::Crossfade);
+        flowboxrevealer.set_transition_duration(3000); // in milliseconds
+        flowboxrevealer.set_child(Some(&flowbox));
+    flowboxrevealer.set_reveal_child(true);
+
 
     let scrollwindow = ScrolledWindow::builder()
         .hexpand(true)
@@ -1600,14 +1607,7 @@ fn build_search_content_box(
     flowcontentbox.set_vexpand(true);
     flowcontentbox.set_hexpand(true);
 
-    let flowcontentloading = Spinner::builder()
-        .height_request(32)
-        .width_request(32)
-        .build();
-    flowcontentbox.append(&flowcontentloading);
-    flowcontentloading.hide();
-
-    flowcontentbox.append(&flowbox);
+    flowcontentbox.append(&flowboxrevealer);
     scrollwindow.set_child(Some(&flowcontentbox));
     println!("Inside the search content box flowcontentbox");
     let (sender, receiver) = async_channel::unbounded::<(String, ProductCatalog)>();
@@ -1622,11 +1622,9 @@ fn build_search_content_box(
     let product_ref = Arc::new(Mutex::new(productpage));
     let product_loadmore_ref = Arc::clone(&product_ref);
     //let flowbox_clone: FlowBox = flowbox.clone();
-    let flowcontentloading_clone = flowcontentloading.clone();
-    let flowbox_clone = flowbox.clone();
-    searchentry.connect_changed(move |searchentry| {
-        flowcontentloading_clone.show();
-        flowbox_clone.hide();
+    let flowboxrevealer_clone = flowboxrevealer.clone();
+    searchentry.connect_search_changed(move |searchentry| {
+
         println!("search_contentbox widget has been changed");
         let sender = firstloadsender.clone();
         let sender_ref = Arc::new(Mutex::new(sender.clone()));
@@ -1662,6 +1660,7 @@ fn build_search_content_box(
             while let Ok((message, productcatalog)) = receiver.recv().await {
                 println!("Search Entry Changed Recv");
                 if message.eq("firstload") {
+                    flowboxrevealer_clone.set_reveal_child(false);
                     while flowbox.first_child().is_some() {
                         let child = flowbox.first_child().unwrap();
                         flowbox.remove(&child);
@@ -1676,14 +1675,7 @@ fn build_search_content_box(
                     //themecategory_loadingpage.remove(&search_contentbox);
 
                     themecategory_loadingpage.append(&searchcontentpage);
-                    flowbox.show();
-                    flowcontentloading.hide();
-                } else if message.eq("loadmore") {
-                    themecategory_loadingpage.remove(&searchcontentpage);
-                    for each_product in productcatalog.data {
-                        build_flowbox_for_page(&each_product, &flowbox, &window);
-                        //loadmorebox.set_child(&None);
-                    }
+                    flowboxrevealer.set_reveal_child(true);
                 }
             }
         }
@@ -1716,7 +1708,7 @@ fn build_ui(app: &adw::Application) {
     // Initial Screen Widgets below Starts
     // View Switcher
     let view_switcher = adw::InlineViewSwitcher::new();
-    view_switcher.add_css_class("round");
+    //view_switcher.add_css_class("round");
 
     // View Stack
     let view_stack = adw::ViewStack::new();
@@ -1758,7 +1750,7 @@ fn build_ui(app: &adw::Application) {
             .application_name("Linux Theme Store")
             .developer_name("Debasish Patra")
             .application_icon("io.github.debasish_patra_1987.linuxthemestore")
-            .version("1.0.1")
+            .version("1.0.2")
             .license_type(License::Gpl30)
             .comments("Download and Install Desktop Themes")
             .build();
