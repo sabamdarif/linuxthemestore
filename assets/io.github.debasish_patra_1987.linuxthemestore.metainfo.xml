@@ -14,19 +14,19 @@
   <screenshots>
     <screenshot type="default">
       <caption>Light Mode</caption>
-      <image>https://raw.githubusercontent.com/debasish-patra-1987/linuxthemestore/5ddc564b1da7757431489d62c06bce76865dd695/screenshots/1.png</image>
-    </screenshot>
-    <screenshot type="default">
-      <caption>Light Mode Detailed</caption>
-      <image>https://raw.githubusercontent.com/debasish-patra-1987/linuxthemestore/5ddc564b1da7757431489d62c06bce76865dd695/screenshots/2.png</image>
+      <image>https://raw.githubusercontent.com/debasish-patra-1987/linuxthemestore/091a55bcc31eb254b90114c6719c200fe5f86b47/screenshots/1.png</image>
     </screenshot>
     <screenshot type="default">
       <caption>Dark Mode</caption>
-      <image>https://raw.githubusercontent.com/debasish-patra-1987/linuxthemestore/5ddc564b1da7757431489d62c06bce76865dd695/screenshots/3.png</image>
+      <image>https://raw.githubusercontent.com/debasish-patra-1987/linuxthemestore/091a55bcc31eb254b90114c6719c200fe5f86b47/screenshots/2.png</image>
+    </screenshot>
+    <screenshot type="default">
+      <caption>Light Mode Detailed</caption>
+      <image>https://raw.githubusercontent.com/debasish-patra-1987/linuxthemestore/091a55bcc31eb254b90114c6719c200fe5f86b47/screenshots/3.png</image>
     </screenshot>
     <screenshot type="default">
       <caption>Dark Mode Detailed</caption>
-      <image>https://raw.githubusercontent.com/debasish-patra-1987/linuxthemestore/5ddc564b1da7757431489d62c06bce76865dd695/screenshots/4.png</image>
+      <image>https://raw.githubusercontent.com/debasish-patra-1987/linuxthemestore/091a55bcc31eb254b90114c6719c200fe5f86b47/screenshots/4.png</image>
     </screenshot>
   </screenshots>
   <developer_name>Debasish Patra</developer_name>
