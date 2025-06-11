@@ -37,6 +37,16 @@
   <url type="bugtracker">https://github.com/debasish-patra-1987/linuxthemestore/issues</url>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="1.0.3" date="2025-06-11">
+      <description>
+        <p>Features</p>
+          <ul>
+            <li>Search is now separate and includes all categories</li>
+            <li>Added Wallpapers</li>
+            <li>Added autoscrolling when bottom of the category page is reached</li>
+          </ul>
+      </description>
+    </release>
     <release version="1.0.2" date="2025-06-06">
       <description>
         <p>Features</p>

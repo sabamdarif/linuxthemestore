@@ -1,8 +1,12 @@
 use adw::glib::object::IsA;
+use adw::glib::timeout_add_local;
+use adw::glib::source::SourceId;
+use adw::glib::ControlFlow::Continue;
 use adw::gtk::DrawingArea;
 use adw::gtk::SearchEntry;
 use adw::prelude::{ActionRowExt, AdwDialogExt, ExpanderRowExt, PreferencesGroupExt};
 use chrono::DateTime;
+use gtk4::prelude::AdjustmentExt;
 use gtk4::prelude::{ButtonExt, DrawingAreaExt, DrawingAreaExtManual, EditableExt};
 use gtk4::{Button, ContentFit, CssProvider, GestureClick, Image, License};
 use reqwest::blocking::Client;
@@ -12,6 +16,7 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 
 use std::ops::{Deref, DerefMut};
+use std::path::Path;
 use std::rc::Rc;
 use std::thread::{self};
 
@@ -216,8 +221,8 @@ impl SortType {
     }
     pub fn get_all_sort_types() -> Vec<&'static SortType> {
         vec![
-            &SortType::Latest,
             &SortType::Rating,
+            &SortType::Latest,
             &SortType::Creator,
             &SortType::Downloads,
             &SortType::Alphabetical,
@@ -230,6 +235,7 @@ pub enum Catalog {
     Cursors,
     GnomeShellThemes,
     Gtk4Themes,
+    Wallpapers,
 }
 impl Catalog {
     pub fn get_id(&self) -> &str {
@@ -238,23 +244,26 @@ impl Catalog {
             Catalog::Cursors => "107",
             Catalog::GnomeShellThemes => "134",
             Catalog::Gtk4Themes => "135",
+            Catalog::Wallpapers => "295",
         }
     }
     pub fn to_string(&self) -> &str {
         match &self {
-            Catalog::FullIconThemes => "Full Icon Themes",
-            Catalog::Cursors => "Cursor Themes",
-            Catalog::GnomeShellThemes => "Gnome Shell Themes",
-            Catalog::Gtk4Themes => "Gtk Themes",
+            Catalog::FullIconThemes => "Icon",
+            Catalog::Cursors => "Cursor",
+            Catalog::GnomeShellThemes => "Gnome Shell",
+            Catalog::Gtk4Themes => "Gtk",
+            Catalog::Wallpapers => "Wallpapers",
         }
     }
-    pub fn id_to_string(id: &str) -> &str {
-        match id {
-            "132" => "Full Icon Themes",
-            "107" => "Cursor Themes",
-            "134" => "Gnome Shell Themes",
-            "135" => "Gtk Themes",
-            _ => "Others",
+    pub fn id_to_string(&self) -> &str {
+        match self.get_id() {
+            "132" => "Icon",
+            "107" => "Cursor",
+            "134" => "Gnome Shell",
+            "135" => "Gtk",
+            "295" => "Wallpapers",
+            _ => "Unknown",
         }
     }
     pub fn id_to_catalog(id: &str) -> Catalog {
@@ -263,7 +272,8 @@ impl Catalog {
             "107" => Catalog::Cursors,
             "134" => Catalog::GnomeShellThemes,
             "135" => Catalog::Gtk4Themes,
-            _ => Catalog::Gtk4Themes,
+            "295" => Catalog::Wallpapers,
+            _ => Catalog::Wallpapers,
         }
     }
     pub fn get_all_catalog_types() -> Vec<Catalog> {
@@ -272,6 +282,7 @@ impl Catalog {
             Catalog::Cursors,
             Catalog::GnomeShellThemes,
             Catalog::Gtk4Themes,
+            Catalog::Wallpapers,
         ]
     }
 }
@@ -359,7 +370,7 @@ impl SearchPageProps {
         let base_url = String::from("www.pling.com");
         String::from("https://")
             + &base_url
-            + "/ocs/v1/content/data?format=json&categories=132,107,134,135&pagesize="
+            + "/ocs/v1/content/data?format=json&categories=132,107,134,135,295&pagesize="
             + format!("{}", self.pagesize).as_str()
             + "&page=0"
             + "&sortmode=update"
@@ -445,9 +456,15 @@ fn install_tar(path: &str, theme_type: &Catalog) -> Result<()> {
         Catalog::Gtk4Themes | Catalog::GnomeShellThemes => {
             extract_path.push(".local/share/themes");
         }
+        Catalog::Wallpapers => {
+            extract_path.push(".local/share/wallpapers");
+        }
     }
 
     fs::create_dir_all(&extract_path)?;
+    println!("Theme Type : {:?}", theme_type);
+    println!("Path : {}", &path);
+    println!("extract_path : {}", &extract_path.display());
 
     if path.ends_with(".tar") || path.ends_with(".tar.xz") || path.ends_with(".tar.gz") {
         Command::new("tar")
@@ -471,6 +488,12 @@ fn install_tar(path: &str, theme_type: &Catalog) -> Result<()> {
             .arg(&extract_path)
             .output()
             .expect("Failed to extract .zip");
+    } else if path.ends_with(".jpg") || path.ends_with(".jpeg") || path.ends_with(".png")|| path.ends_with(".svg"){
+        Command::new("cp")
+            .arg(&path)
+            .arg(&extract_path)
+            .output()
+            .expect("Failed to move the wallpaper");
     } else {
         println!("Unsupported file type: {}", path);
     }
@@ -559,17 +582,7 @@ pub fn load_custom_css() {
                     .img-cover{
                         border-radius: 2%;
                         border-width: 15px;
-                        box-shadow: 0 8px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 8px 0 rgba(0, 0, 0, 0.1);
-                    }
-                    .blur{
-                        filter: blur(1px);
-                        -webkit-filter: blur(1px);
-                    }
-                    .card {
-                        box-shadow: 0 8px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 8px 0 rgba(0, 0, 0, 0.1);
-                    }
-                    button:hover {
-                        transform: scale(1.01); /* 120% zoom */
+                        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.1);
                     }
                     "
 
@@ -617,10 +630,7 @@ pub fn get_search_product_catalog(searchpageprops: &SearchPageProps) -> Result<P
     //println!("{}", serde_json::to_string_pretty(&res).unwrap());
 
     let resp_json_products: ProductCatalog = serde_json::from_value(res).unwrap();
-    println!(
-        "{}",
-        serde_json::to_string_pretty(&resp_json_products).unwrap()
-    );
+    //println!(        "{}",        serde_json::to_string_pretty(&resp_json_products).unwrap()    );
     Ok(resp_json_products)
 }
 
@@ -644,7 +654,7 @@ fn downloadthumb(each_product: &Product) -> Result<()> {
         let save_dir_copy = save_dir;
         let _ = fs::create_dir_all(&save_dir_copy);
 
-        fetch_url(&firstimage.replace("770x540", "770x540"), save_path).unwrap();
+        fetch_url(&firstimage.replace("770x540", "512x512"), save_path).unwrap();
     }
 
     Ok(())
@@ -665,7 +675,7 @@ fn downloadotherimages(each_product: &Product) -> Result<()> {
             let save_dir_copy = save_dir;
             let _ = fs::create_dir_all(&save_dir_copy);
 
-            fetch_url(&each_image.replace("770x540", "770x540"), save_path).unwrap();
+            fetch_url(&each_image.replace("770x540", "512x512"), save_path).unwrap();
         }
     }
     Ok(())
@@ -700,7 +710,7 @@ fn _downloadthumbs(products: Vec<Product>) -> Result<()> {
                     let save_dir_copy = save_dir;
                     let _ = fs::create_dir_all(&save_dir_copy);
 
-                    fetch_url(&image_small.replace("770x540", "770x540"), save_path).unwrap();
+                    fetch_url(&image_small.replace("770x540", "512x512"), save_path).unwrap();
                 }
             }
         });
@@ -729,7 +739,7 @@ fn build_category_page(
     );
 
     let themecategorysortbybutton = adw::InlineViewSwitcher::new();
-    //themecategorysortbybutton.add_css_class("round");
+    themecategorysortbybutton.add_css_class("round");
     themecategorysortbybutton.set_can_shrink(true);
 
     let themecategorysortby_view_stack = adw::ViewStack::new();
@@ -776,7 +786,8 @@ fn build_search_page(
         view_stack.add_titled(&searchbox, Some("Search Themes"), "Search Themes");
 
     let searchinput = SearchEntry::new();
-    searchinput.set_search_delay(500);
+    searchinput.set_margin_top(10);
+    searchinput.set_search_delay(0);
     searchinput.set_placeholder_text(Some("e.g. Papirus Theme"));
 
     //searchinput.add_css_class("round");
@@ -807,7 +818,7 @@ fn build_search_page(
     build_search_content_box(&searchinput, &searchresultpage, &window_clone);
 
     searchbox.append(&searchresultpage);
-    println!("{}", searchinput.text().to_string());
+    //println!("{}", searchinput.text().to_string());
 
     //    let searchpageprops = SearchPageProps::default(searchinput.text().to_string() );
 }
@@ -903,7 +914,8 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
     );
     prodnametype_holder.append(
         &Label::builder()
-            .label(Catalog::id_to_string(&each_product.typeid.to_string()))
+            //.label(Catalog::id_to_string(&each_product.typeid.to_string()))
+            .label(&each_product.typename.to_string())
             .margin_bottom(0)
             .margin_top(0)
             .margin_start(10)
@@ -1041,7 +1053,7 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
                 .send_blocking(String::from("imgcomplete"))
                 .unwrap_or_default();
             //println!("After sending");
-            downloadotherimages(&each_prod_clone).unwrap_or_default();
+            //downloadotherimages(&each_prod_clone).unwrap_or_default();
         });
 
         // The main loop executes the asynchronous block
@@ -1109,6 +1121,14 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
         let dialogbody = GtkBox::new(Orientation::Vertical, 0);
         dialog_scrollbox.set_child(Some(&dialogbody));
         dialogbox.append(&dialog_scrollbox);
+        let (sender, receiver) = async_channel::unbounded::<String>();
+        let product_clone = product.clone();
+        adw::gio::spawn_blocking(move || {
+        downloadotherimages(&product_clone).unwrap_or_default();
+        sender
+            .send_blocking("allimagesdownloaded".to_string())
+            .unwrap_or_default();
+        });
 
         //Insert Images in dialog body
         let total_preview_pics = product.previewpics.len();
@@ -1155,15 +1175,18 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
             .margin_bottom(15)
             .margin_top(0)
             .build();
+        if total_preview_pics > 1{
         each_img_box.append(&prev_button);
+        }
         each_img_box.append(&img);
+                if total_preview_pics > 1{
         each_img_box.append(&next_button);
-
+                }
         let imgclamp = Clamp::new();
         imgclamp.set_css_classes(&vec!["clamp"]);
-        imgclamp.set_child(Some(&each_img_box));
         imgclamp.set_tightening_threshold(256);
         imgclamp.set_maximum_size(256);
+        imgclamp.set_size_request(512, 512);
         imgclamp.set_margin_top(20);
         imgclamp.set_margin_bottom(20);
 
@@ -1179,8 +1202,10 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
                 *current_index -= 1;
             }
             let current_index = *current_index as usize;
+
             let imgpath = "/tmp/themeinstaller/cache/".to_string() + &previewpics[current_index];
             img_prev.set_filename(Some(&std::path::Path::new(imgpath.as_str())));
+
         });
 
         let current_index = Arc::new(Mutex::new((0, total_preview_pics as i32)));
@@ -1195,9 +1220,35 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
                 *current_index += 1;
             }
             let current_index = *current_index as usize;
-            let imgpath =
-                "/tmp/themeinstaller/cache/".to_string() + &previewpics_next[current_index];
+            let imgpath = "/tmp/themeinstaller/cache/".to_string() + &previewpics_next[current_index];
             img_next.set_filename(Some(&std::path::Path::new(imgpath.as_str())));
+        });
+        //imgclamp.hide();
+        let allimagespinner = Spinner::builder()
+            .valign(Align::Center)
+            .halign(Align::Center)
+            .hexpand(true)
+            .vexpand(true)
+            .width_request(32)
+            .height_request(32)
+            .build();
+        //allimagespinner.show();
+        imgclamp.set_child(Some(&allimagespinner));
+
+
+
+        let imgclamp_clone = imgclamp.clone();
+        glib::spawn_future_local({
+            async move {
+                while let Ok(message) = receiver.recv().await {
+                    if message.eq(&String::from("allimagesdownloaded")) {
+                        //allimagespinner.hide();
+                        imgclamp_clone.set_child(Some(&each_img_box));
+                        //imgclamp_clone.show();
+                    } else {
+                    }
+                }
+            }
         });
 
         dialogbody.append(&imgclamp);
@@ -1227,11 +1278,14 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
             row.add_suffix(&downloadbutton);
             let new_variant = each_variant.clone();
             let catalogtype = Catalog::id_to_catalog(&product.typeid.to_string().as_str());
+            //println!("Catalog Name : {:?}",&product);
+            //println!("Catalog Typeid : {:?}",&product.typeid.to_string().as_str());
+            //println!("Catalog Type : {:?}",catalogtype.get_id());
 
             let (senderdownload, receiverdownload) = async_channel::unbounded::<String>();
             downloadbutton.connect_clicked(move |downloadbutton| {
                 downloadbutton.set_child(Some(&Spinner::new()));
-                eprintln!("Clicked!");
+                //eprintln!("Clicked!");
 
                 let sender = senderdownload.clone();
                 let catalogtype_arc = Arc::new(Mutex::new(catalogtype.clone()));
@@ -1464,7 +1518,9 @@ fn build_content_box(
         .build();
     scrollwindow.set_policy(PolicyType::Automatic, PolicyType::Automatic);
 
+
     contentpage.append(&scrollwindow);
+    /*
     let loadmorebox = Button::builder()
         .child(&Image::from_icon_name("go-down-symbolic"))
         .hexpand(true)
@@ -1475,6 +1531,7 @@ fn build_content_box(
         .margin_top(0)
         .css_classes(vec!["pill", "1pill", "1flat", "1suggested-action"])
         .build();
+     */
     //contentpage.append(&scrollwindow);
     let flowcontentbox = GtkBox::new(Orientation::Vertical, 0);
     flowcontentbox.set_vexpand(true);
@@ -1482,13 +1539,18 @@ fn build_content_box(
 
     flowcontentbox.append(&flowbox);
     scrollwindow.set_child(Some(&flowcontentbox));
-    flowcontentbox.append(&loadmorebox);
+    let flowboxloading = Spinner::new();
+    flowboxloading.set_width_request(32);
+    flowboxloading.set_height_request(32);
+    flowcontentbox.append(&flowboxloading);
+    flowboxloading.hide();
+    //flowcontentbox.append(&loadmorebox);
 
     let (sender, receiver) = async_channel::unbounded::<ProductCatalog>();
     let (loadmoresender, loadmorereceiver) = async_channel::unbounded::<ProductCatalog>();
     let productpage_ref = Arc::new(Mutex::new(productpage.clone()));
     let loadmore_productpage_ref = Arc::clone(&productpage_ref);
-    loadmorebox.connect_clicked(move |loadmorebox| {
+    /*loadmorebox.connect_clicked(move |loadmorebox| {
         loadmorebox.set_sensitive(false);
         loadmorebox.set_child(Some(
             &Spinner::builder()
@@ -1498,19 +1560,61 @@ fn build_content_box(
         ));
 
         //println!("_contentbox widget has been realized");
-        let sender = loadmoresender.clone();
-        let loadmore_productpage_ref = loadmore_productpage_ref.clone();
 
-        // Run async code to get all required values for populating full icon themes
-        adw::gio::spawn_blocking(move || {
-            let mut productpage_mutex = loadmore_productpage_ref.lock().unwrap();
-            let productprops = productpage_mutex.deref_mut();
-            productprops.set_page(productprops.pageno + 1);
-            let productcatalog: ProductCatalog = get_product_catalog(&productprops).unwrap();
-            //downloadthumbs(productcatalog.data.clone()).unwrap();
-            sender.send_blocking(productcatalog).unwrap_or_default();
+    }); */
+
+
+        let vadjustment = scrollwindow.vadjustment();
+        let vadjustment_clone = vadjustment.clone();
+        let flowboxloading_clone = flowboxloading.clone();
+        let loadmoresender_clone = loadmoresender.clone();
+        let loadmore_productpage_ref_clone = loadmore_productpage_ref.clone();
+        vadjustment.connect_value_changed(move |vadjustment| {
+            let value = vadjustment.value();
+            let upper = vadjustment.upper();
+            let page_size = vadjustment.page_size();
+
+            if (value + page_size) >= (upper - 0.5) {
+            flowboxloading_clone.show();
+            let sender = loadmoresender_clone.clone();
+            let loadmore_productpage_ref = loadmore_productpage_ref_clone.clone();
+
+            // Run async code to get all required values for populating full icon themes
+            adw::gio::spawn_blocking(move || {
+                let mut productpage_mutex = loadmore_productpage_ref.lock().unwrap();
+                let productprops = productpage_mutex.deref_mut();
+                productprops.set_page(productprops.pageno + 1);
+                let productcatalog: ProductCatalog = get_product_catalog(&productprops).unwrap();
+                //downloadthumbs(productcatalog.data.clone()).unwrap();
+                sender.send_blocking(productcatalog).unwrap_or_default();
+            });
+            }
         });
-    });
+        let flowboxloading_clone = flowboxloading.clone();
+        let loadmoresender_clone = loadmoresender.clone();
+        let loadmore_productpage_ref_clone = loadmore_productpage_ref.clone();
+        scrollwindow.connect_map(move |_| {
+            let value = vadjustment_clone.value();
+            let upper = vadjustment_clone.upper();
+            let page_size = vadjustment_clone.page_size();
+
+            if (value + page_size) >= (upper - 0.5) {
+                flowboxloading_clone.show();
+                let sender = loadmoresender_clone.clone();
+                let loadmore_productpage_ref = loadmore_productpage_ref_clone.clone();
+
+                // Run async code to get all required values for populating full icon themes
+                adw::gio::spawn_blocking(move || {
+                    let mut productpage_mutex = loadmore_productpage_ref.lock().unwrap();
+                    let productprops = productpage_mutex.deref_mut();
+                    productprops.set_page(productprops.pageno + 1);
+                    let productcatalog: ProductCatalog = get_product_catalog(&productprops).unwrap();
+                    //downloadthumbs(productcatalog.data.clone()).unwrap();
+                    sender.send_blocking(productcatalog).unwrap_or_default();
+                });
+            }
+        });
+
     let contentbox_productpage_ref = Arc::clone(&productpage_ref);
     themecategory_contentbox.connect_realize(move |_contentbox| {
         //println!("_contentbox widget has been realized");
@@ -1530,6 +1634,7 @@ fn build_content_box(
 
     // The main loop executes the asynchronous block
     let window: ApplicationWindow = window.clone();
+    let flowboxloading_clone = flowboxloading.clone();
     glib::spawn_future_local({
         async move {
             if let Ok(productcatalog) = receiver.recv().await {
@@ -1538,14 +1643,16 @@ fn build_content_box(
                 }
                 themecategory_loadingpage.remove(&themecategory_contentbox);
                 themecategory_loadingpage.append(&contentpage);
+                flowboxloading_clone.hide();
             }
 
             while let Ok(productcatalog) = loadmorereceiver.recv().await {
                 for each_product in productcatalog.data {
                     build_flowbox_for_page(&each_product, &flowbox, &window);
                     //loadmorebox.set_child(&None);
-                    loadmorebox.set_child(Some(&Image::from_icon_name("go-down-symbolic")));
-                    loadmorebox.set_sensitive(true);
+                    //loadmorebox.set_child(Some(&Image::from_icon_name("go-down-symbolic")));
+                    //loadmorebox.set_sensitive(true);
+                    flowboxloading_clone.hide();
                 }
             }
         }
@@ -1623,6 +1730,7 @@ fn build_search_content_box(
     let product_loadmore_ref = Arc::clone(&product_ref);
     //let flowbox_clone: FlowBox = flowbox.clone();
     let flowboxrevealer_clone = flowboxrevealer.clone();
+
     searchentry.connect_search_changed(move |searchentry| {
 
         println!("search_contentbox widget has been changed");
@@ -1701,14 +1809,14 @@ fn build_ui(app: &adw::Application) {
     // Header bar and view switcher
     let header_bar = adw::HeaderBar::new();
     let header_box = GtkBox::new(Orientation::Vertical, 10);
-    header_box.set_css_classes(&vec!["background"]);
+    //header_box.set_css_classes(&vec!["background"]);
     //header_bar.append();
-    header_box.append(&header_bar);
+
 
     // Initial Screen Widgets below Starts
     // View Switcher
     let view_switcher = adw::InlineViewSwitcher::new();
-    //view_switcher.add_css_class("round");
+    view_switcher.add_css_class("round");
 
     // View Stack
     let view_stack = adw::ViewStack::new();
@@ -1720,23 +1828,28 @@ fn build_ui(app: &adw::Application) {
     // Header Bar Setup below
     header_box.set_hexpand(true);
     header_box.set_vexpand(true);
+        header_box.set_margin_start(0);
+        header_box.set_margin_end(0);
+        header_box.set_margin_top(10);
+        header_box.set_margin_bottom(10);
     view_switcher.set_can_shrink(true);
 
     let view_switcher_box = GtkBox::new(Orientation::Horizontal, 0);
-    view_switcher_box.set_halign(Align::Start);
+    view_switcher_box.set_halign(Align::Center);
     view_switcher_box.append(&view_switcher);
-    header_bar.set_title_widget(Some(&view_switcher_box));
+
+
 
     // Add About in header bar ends
 
     let outer_view_stack = GtkBox::new(Orientation::Vertical, 0);
     outer_view_stack.append(&view_stack);
-    header_box.append(&outer_view_stack);
 
+    let bodybox = GtkBox::new(Orientation::Vertical,0);
     // Create main application window
     let window = ApplicationWindow::builder()
         .application(app)
-        .content(&header_box)
+        .content(&bodybox)
         .default_width(1980)
         .default_height(1080)
         .build();
@@ -1750,7 +1863,7 @@ fn build_ui(app: &adw::Application) {
             .application_name("Linux Theme Store")
             .developer_name("Debasish Patra")
             .application_icon("io.github.debasish_patra_1987.linuxthemestore")
-            .version("1.0.2")
+            .version("1.0.3")
             .license_type(License::Gpl30)
             .comments("Download and Install Desktop Themes")
             .build();
@@ -1758,9 +1871,38 @@ fn build_ui(app: &adw::Application) {
         about_dialog.present(Some(&window_clone));
     });
 
+
+    let body_switcher_box = adw::InlineViewSwitcher::new();
+    body_switcher_box.add_css_class("round");
+    body_switcher_box.set_valign(Align::Start);
+    body_switcher_box.set_halign(Align::Center);
+
+    let body_viewstack = adw::ViewStack::new();
+    let _body_viewstack = body_viewstack.add_titled(
+        &header_box,
+        Some("Browse"),
+        "Browse",
+    );
+
+    bodybox.append(&header_bar);
+    bodybox.append(&header_box);
+    bodybox.append(&body_viewstack);
+
+    header_box.append(&view_switcher_box);
+    header_box.append(&outer_view_stack);
+    header_bar.set_title_widget(Some(&body_switcher_box));
+    body_switcher_box.set_stack(Some(&body_viewstack));
+
     for each_catalog_type in Catalog::get_all_catalog_types() {
         build_category_page(&view_stack, &outer_view_stack, &each_catalog_type, &window);
     }
-    build_search_page(&view_stack, &outer_view_stack, &window);
+    build_search_page(&body_viewstack, &outer_view_stack, &window);
+    /*
+    let _body_viewstack = body_viewstack.add_titled(
+        &Label::new(Some("Installed")),
+        Some("Installed"),
+        "Installed",
+    );
+    */
     window.present();
 }

@@ -20,22 +20,10 @@ For Arch Linux Build is available in aur..
 ```sh
 yay -S linuxthemestore-git
 ```
-## _Binary build_
-Installation
-```sh
-git clone https://github.com/debasish-patra-1987/linuxthemestore.git
-cd linuxthemestore
-meson setup builddir --prefix=/usr
-meson compile -C builddir
-sudo meson install -C builddir
-```
-Uninstall
+## _Flatpak_
 
-```
-cd linuxthemestore
-cd builddir
-sudo ninja uninstall
+flatpak install flathub io.github.debasish_patra_1987.linuxthemestore
 
 ## License
-MIT
-**Free Software, Hell Yeah!**
+GPL3+
+
