@@ -1,17 +1,18 @@
+use adw::gio::prelude::SettingsExt;
+use adw::gio::Settings;
 use adw::glib::object::IsA;
-use adw::glib::timeout_add_local;
-use adw::glib::source::SourceId;
-use adw::glib::ControlFlow::Continue;
 use adw::gtk::DrawingArea;
 use adw::gtk::SearchEntry;
 use adw::prelude::{ActionRowExt, AdwDialogExt, ExpanderRowExt, PreferencesGroupExt};
 use chrono::DateTime;
 use gtk4::prelude::AdjustmentExt;
 use gtk4::prelude::{ButtonExt, DrawingAreaExt, DrawingAreaExtManual, EditableExt};
-use gtk4::{Button, ContentFit, CssProvider, GestureClick, Image, License};
+use gtk4::CheckButton;
+use gtk4::{Button, ContentFit, CssProvider, GestureClick, License};
 use reqwest::blocking::Client;
 use serde::de::Deserializer;
 use serde::{Deserialize, Serialize};
+use walkdir::WalkDir;
 use std::cell::RefCell;
 use std::collections::HashMap;
 
@@ -581,8 +582,8 @@ pub fn load_custom_css() {
 
                     .img-cover{
                         border-radius: 2%;
-                        border-width: 15px;
-                        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.1);
+                        border-width: 1px;
+                        border-color: white;
                     }
                     "
 
@@ -745,7 +746,7 @@ fn build_category_page(
     let themecategorysortby_view_stack = adw::ViewStack::new();
     themecategorysortby_view_stack.set_enable_transitions(true);
     //themecategorysortby_view_stack.add_css_class("background");
-    themecategorysortby_view_stack.set_transition_duration(20);
+    themecategorysortby_view_stack.set_transition_duration(200);
 
     themecategorysortbybutton.set_valign(Align::Start);
     themecategorysortbybutton.set_halign(Align::Center);
@@ -822,6 +823,59 @@ fn build_search_page(
 
     //    let searchpageprops = SearchPageProps::default(searchinput.text().to_string() );
 }
+
+
+fn build_installed_page(
+    view_stack: &ViewStack,
+    outer_view_stack: &GtkBox,
+    theme_type: &Catalog,
+    window: &ApplicationWindow,
+) {
+    let themecategoryloadingpage = GtkBox::new(Orientation::Vertical, 10);
+    themecategoryloadingpage.add_css_class("background");
+    let _themecategorypage_viewstack = view_stack.add_titled(
+        &themecategoryloadingpage,
+        Some(&theme_type.to_string()),
+        theme_type.to_string(),
+    );
+
+    let themecategorysortbybutton = adw::InlineViewSwitcher::new();
+    themecategorysortbybutton.add_css_class("round");
+    themecategorysortbybutton.set_can_shrink(true);
+
+    let themecategorysortby_view_stack = adw::ViewStack::new();
+    themecategorysortby_view_stack.set_enable_transitions(true);
+    //themecategorysortby_view_stack.add_css_class("background");
+    themecategorysortby_view_stack.set_transition_duration(200);
+
+    themecategorysortbybutton.set_valign(Align::Start);
+    themecategorysortbybutton.set_halign(Align::Center);
+    themecategoryloadingpage.append(&themecategorysortbybutton);
+    //outer_view_stack.append(&fulliconsortbybutton);
+
+    outer_view_stack.append(&themecategorysortbybutton);
+
+    themecategorysortbybutton.set_stack(Some(&themecategorysortby_view_stack));
+    let themecategorysortby_view_stack_box = GtkBox::new(Orientation::Vertical, 0);
+    themecategorysortby_view_stack_box.append(&themecategorysortby_view_stack);
+    themecategoryloadingpage.append(&themecategorysortby_view_stack_box);
+
+    // Initial Screen Widgets below Ends
+
+    // Starting async loading of items for each page
+    // fullcionprodpage
+
+/*
+        build_content_box(
+            ProductPageProps::default()
+                .set_catalog(theme_type.to_owned())
+                .set_order(each_sorting_type.to_owned()),
+            &themecategorysortby_view_stack,
+            &window,
+        );
+        */
+
+}
 // contentbox function
 fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &ApplicationWindow) {
     let imgpath = "/tmp/themeinstaller/cache/".to_string() + &each_product.previewpics[0];
@@ -833,13 +887,13 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
         .margin_end(0)
         .margin_top(0)
         .margin_bottom(0)
-        .css_name("img-cover")
+        //.css_name("img-cover")
         .build();
     img.add_css_class("img-round");
     img.set_content_fit(ContentFit::Cover);
     //img.set_filename(Some(&std::path::Path::new(imgpath.as_str())));
     img.set_size_request(260, 260);
-    //img.set_can_shrink(true);
+    img.set_can_shrink(true);
     let imgclamp = Clamp::new();
     let imagespinner = Spinner::builder()
         .valign(Align::Center)
@@ -856,6 +910,7 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
         .vexpand(true)
         .height_request(260)
         .width_request(260)
+        .css_name("img-cover")
         .build();
     imagebox.append(&imagespinner);
     //imgclamp.set_child(Some(&img));
@@ -1144,8 +1199,9 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
             .css_name("img-cover")
             .build();
         img.add_css_class("img-cover");
-        img.set_size_request(512, 512);
-        img.set_content_fit(ContentFit::Cover);
+        //img.set_size_request(512, 512);
+        img.set_width_request(512);
+        img.set_content_fit(ContentFit::Fill);
         img.set_filename(Some(&std::path::Path::new(imgpath.as_str())));
 
         let each_img_box = GtkBox::builder()
@@ -1179,7 +1235,7 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
         each_img_box.append(&prev_button);
         }
         each_img_box.append(&img);
-                if total_preview_pics > 1{
+        if total_preview_pics > 1{
         each_img_box.append(&next_button);
                 }
         let imgclamp = Clamp::new();
@@ -1659,6 +1715,90 @@ fn build_content_box(
     });
 }
 
+fn build_installed_content_box(
+    installed_page: &InstalledTheme,
+    view_stack: &ViewStack,
+    window: &ApplicationWindow,
+) {
+    let themecategory_contentbox = GtkBox::new(Orientation::Vertical, 20);
+    //window.set_height_request(1024);
+    themecategory_contentbox.set_valign(Align::Center);
+    themecategory_contentbox.set_halign(Align::Center);
+
+    themecategory_contentbox.set_vexpand(true);
+    themecategory_contentbox.set_hexpand(true);
+    let spinner_loading_themecategory_latest = Spinner::new();
+    spinner_loading_themecategory_latest.set_width_request(48);
+    spinner_loading_themecategory_latest.set_height_request(48);
+
+    let spinner_label_themecategory_latest = Label::builder()
+        .label(String::from("Fetching ") + installed_page.name.to_string() + ". Please wait...")
+        .css_classes(vec!["dimmed", "Heading-4"])
+        .build();
+
+    themecategory_contentbox.append(&spinner_loading_themecategory_latest);
+    themecategory_contentbox.append(&spinner_label_themecategory_latest);
+    let themecategory_loadingpage = GtkBox::new(Orientation::Vertical, 0);
+    themecategory_loadingpage.append(&themecategory_contentbox);
+    let _fulliconpage_viewstack_latest = view_stack.add_titled(
+        &themecategory_loadingpage,
+        Some(installed_page.name.to_string()),
+        installed_page.name.to_string(),
+    );
+    //_page async loading of first page
+
+    let contentpage = GtkBox::new(Orientation::Vertical, 0);
+    //contentpage.set_css_classes(&vec!["card"]);
+
+    let flowbox = FlowBox::builder().build();
+    flowbox.set_vexpand(true);
+    flowbox.set_hexpand(true);
+    flowbox.set_valign(Align::Center);
+    flowbox.set_halign(Align::Center);
+    flowbox.set_activate_on_single_click(false);
+    flowbox.set_min_children_per_line(1);
+    flowbox.set_max_children_per_line(5);
+    flowbox.set_selection_mode(SelectionMode::None);
+    flowbox.set_css_classes(&vec!["suggested-action"]);
+
+    let scrollwindow = ScrolledWindow::builder()
+        .hexpand(true)
+        .vexpand(true)
+        .build();
+    scrollwindow.set_policy(PolicyType::Automatic, PolicyType::Automatic);
+
+
+    contentpage.append(&scrollwindow);
+    /*
+    let loadmorebox = Button::builder()
+        .child(&Image::from_icon_name("go-down-symbolic"))
+        .hexpand(true)
+        .vexpand(true)
+        .halign(Align::Center)
+        .valign(Align::End)
+        .margin_bottom(15)
+        .margin_top(0)
+        .css_classes(vec!["pill", "1pill", "1flat", "1suggested-action"])
+        .build();
+     */
+    //contentpage.append(&scrollwindow);
+    let flowcontentbox = GtkBox::new(Orientation::Vertical, 0);
+    flowcontentbox.set_vexpand(true);
+    flowcontentbox.set_hexpand(true);
+
+    flowcontentbox.append(&flowbox);
+    scrollwindow.set_child(Some(&flowcontentbox));
+
+    let installed_box = GtkBox::builder().build();
+    installed_box.append(&Label::new(Some("X")));
+
+    flowcontentbox.append(&installed_box);
+//    flowboxloading.hide();
+    //flowcontentbox.append(&loadmorebox);
+    // The main loop executes the asynchronous block
+
+}
+
 fn build_search_content_box(
     searchentry: &SearchEntry,
     searchresultpage: &GtkBox,
@@ -1822,7 +1962,7 @@ fn build_ui(app: &adw::Application) {
     let view_stack = adw::ViewStack::new();
     view_stack.set_enable_transitions(true);
     view_stack.add_css_class("background");
-    //view_stack.set_transition_duration(20);
+    view_stack.set_transition_duration(200);
     view_switcher.set_stack(Some(&view_stack));
 
     // Header Bar Setup below
@@ -1878,6 +2018,8 @@ fn build_ui(app: &adw::Application) {
     body_switcher_box.set_halign(Align::Center);
 
     let body_viewstack = adw::ViewStack::new();
+    view_stack.set_enable_transitions(true);
+    view_stack.set_transition_duration(200);
     let _body_viewstack = body_viewstack.add_titled(
         &header_box,
         Some("Browse"),
@@ -1897,12 +2039,442 @@ fn build_ui(app: &adw::Application) {
         build_category_page(&view_stack, &outer_view_stack, &each_catalog_type, &window);
     }
     build_search_page(&body_viewstack, &outer_view_stack, &window);
-    /*
+
+    let installed_themes_box = GtkBox::new(Orientation::Vertical,5);
+    installed_themes_box.set_width_request(500);
+
+
+    let themes = get_all_installed_themes();
+    let fulliconprefpage = FlowBox::builder()
+            .build();
+    fulliconprefpage.set_vexpand(true);
+    fulliconprefpage.set_hexpand(true);
+    fulliconprefpage.set_valign(Align::Center);
+    fulliconprefpage.set_halign(Align::Center);
+    fulliconprefpage.set_activate_on_single_click(false);
+    fulliconprefpage.set_min_children_per_line(1);
+    fulliconprefpage.set_max_children_per_line(5);
+    fulliconprefpage.set_selection_mode(SelectionMode::Single);
+    fulliconprefpage.set_css_classes(&vec!["suggested-action"]);
+    let cursorprefpage = FlowBox::builder()
+            .build();
+
+    cursorprefpage.set_vexpand(true);
+    cursorprefpage.set_hexpand(true);
+    cursorprefpage.set_valign(Align::Center);
+    cursorprefpage.set_halign(Align::Center);
+    cursorprefpage.set_activate_on_single_click(false);
+    cursorprefpage.set_min_children_per_line(1);
+    cursorprefpage.set_max_children_per_line(5);
+    cursorprefpage.set_selection_mode(SelectionMode::Single);
+    cursorprefpage.set_css_classes(&vec!["suggested-action"]);
+
+    let gnomeshellprefpage = FlowBox::builder()
+            .build();
+
+    gnomeshellprefpage.set_vexpand(true);
+    gnomeshellprefpage.set_hexpand(true);
+    gnomeshellprefpage.set_valign(Align::Center);
+    gnomeshellprefpage.set_halign(Align::Center);
+    gnomeshellprefpage.set_activate_on_single_click(false);
+    gnomeshellprefpage.set_min_children_per_line(1);
+    gnomeshellprefpage.set_max_children_per_line(5);
+    gnomeshellprefpage.set_selection_mode(SelectionMode::Single);
+    gnomeshellprefpage.set_css_classes(&vec!["suggested-action"]);
+
+    let gtk4prefpage = FlowBox::builder()
+            .build();
+    gtk4prefpage.set_vexpand(true);
+    gtk4prefpage.set_hexpand(true);
+    gtk4prefpage.set_valign(Align::Center);
+    gtk4prefpage.set_halign(Align::Center);
+    gtk4prefpage.set_activate_on_single_click(false);
+    gtk4prefpage.set_min_children_per_line(1);
+    gtk4prefpage.set_max_children_per_line(5);
+    gtk4prefpage.set_selection_mode(SelectionMode::Single);
+    gtk4prefpage.set_css_classes(&vec!["suggested-action"]);
+
+    let installed_themes_scrollbox = ScrolledWindow::builder()            .propagate_natural_height(true)
+            .propagate_natural_width(true)
+            .hscrollbar_policy(PolicyType::Automatic).vscrollbar_policy(PolicyType::Automatic).build();
+
+        let installed_themes_clamp = GtkBox::new(Orientation::Vertical,0);
+        installed_themes_clamp.set_css_classes(&vec!["clamp"]);
+        //installed_themes_clamp.set_size_request(512, 512);
+        installed_themes_clamp.set_margin_top(10);
+        installed_themes_clamp.set_margin_bottom(10);
+        installed_themes_clamp.set_vexpand(true);
+        installed_themes_clamp.set_hexpand(true);
+        installed_themes_clamp.set_vexpand_set(true);
+        installed_themes_clamp.set_hexpand_set(true);
+        installed_themes_clamp.set_valign(Align::Fill);
+        installed_themes_clamp.set_halign(Align::Fill);
+
     let _body_viewstack = body_viewstack.add_titled(
-        &Label::new(Some("Installed")),
+        &installed_themes_clamp,
         Some("Installed"),
         "Installed",
     );
+    /*
+    installed_themes_box.append(&fulliconprefpage);
+    installed_themes_box.append(&cursorprefpage);
+    installed_themes_box.append(&gnomeshellprefpage);
+    installed_themes_box.append(&gtk4prefpage);
     */
+    //let installed_themes_Switcher = InlineViewSwitcher::builder().build();
+
+    let installed_themes_switcher = adw::InlineViewSwitcher::builder().build();
+    let installed_themes_stack = adw::ViewStack::new();
+    installed_themes_stack.set_enable_transitions(true);
+    installed_themes_switcher.set_css_classes(&vec!["round"]);
+    installed_themes_stack.set_transition_duration(20);
+
+    installed_themes_switcher.set_valign(Align::Start);
+    installed_themes_switcher.set_halign(Align::Center);
+
+    let installed_themes_switcher_box = GtkBox::new(Orientation::Vertical,0);
+    installed_themes_switcher_box.set_hexpand(true);
+    installed_themes_switcher_box.set_vexpand(false);
+    //installed_themes_box.append(&installed_themes_switcher_box);
+    installed_themes_switcher_box.append(&installed_themes_switcher);
+    let installed_themes_bodybox = GtkBox::new(Orientation::Vertical,0);
+    installed_themes_clamp.append(&installed_themes_switcher_box);
+    //installed_themes_switcher_box.append(&installed_themes_bodybox);
+
+    installed_themes_bodybox.append(&installed_themes_stack);
+    //installed_themes_switcher.append(&installed_themes_switcher);
+    //outer_view_stack.append(&fulliconsortbybutton);
+
+    //outer_view_stack.append(&themecategorysortbybutton);
+
+    installed_themes_switcher.set_stack(Some(&installed_themes_stack));
+    installed_themes_clamp.append(&installed_themes_switcher_box);
+        installed_themes_clamp.append(&installed_themes_scrollbox);
+    installed_themes_scrollbox.set_child(Some(&installed_themes_bodybox));
+
+    for each_item in themes.iter(){
+        match each_item.name {
+            Catalog::FullIconThemes => {
+                let outerbox = GtkBox::new(Orientation::Horizontal,0);
+                outerbox.set_vexpand(true);
+                outerbox.set_hexpand(true);
+                outerbox.set_vexpand_set(true);
+                outerbox.set_hexpand_set(true);
+                outerbox.set_halign(Align::Fill);
+                outerbox.set_valign(Align::Fill);
+                for each_theme_name in &each_item.options{
+                    let row = ActionRow::builder()
+                    .activatable(false)
+                    .title(each_theme_name)
+                    //.css_name("card")
+                    .build();
+
+                    let checkbox = CheckButton::builder().css_classes(vec!["selection-mode"]).build();
+
+                    row.add_prefix(&checkbox);
+
+                    fulliconprefpage.append(&row);
+                }
+
+                outerbox.append(&fulliconprefpage);
+                installed_themes_stack.add_titled(
+                    &outerbox,
+                    Some(&each_item.name.to_string()),
+                    &each_item.name.to_string(),
+            );
+
+            },
+            Catalog::Cursors =>  {
+                let outerbox = GtkBox::new(Orientation::Horizontal,0);
+                outerbox.set_vexpand(true);
+                outerbox.set_hexpand(true);
+                outerbox.set_halign(Align::Fill);
+                outerbox.set_valign(Align::Fill);
+                for each_theme_name in &each_item.options{
+                    let row = ActionRow::builder()
+                    .activatable(false)
+                    .title(each_theme_name)
+                    //.css_name("card")
+                    .build();
+
+                    let checkbox = CheckButton::builder().css_classes(vec!["selection-mode"]).build();
+
+                    row.add_prefix(&checkbox);
+
+                    cursorprefpage.append(&row);
+                }
+
+                outerbox.append(&cursorprefpage);
+                installed_themes_stack.add_titled(
+                    &outerbox,
+                    Some(&each_item.name.to_string()),
+                    &each_item.name.to_string(),
+                );
+            },
+            Catalog::GnomeShellThemes =>  {
+                let outerbox = GtkBox::new(Orientation::Horizontal,0);
+                outerbox.set_vexpand(true);
+                outerbox.set_hexpand(true);
+                outerbox.set_halign(Align::Fill);
+                outerbox.set_valign(Align::Fill);
+                for each_theme_name in &each_item.options{
+                    let row = ActionRow::builder()
+                    .activatable(false)
+                    .title(each_theme_name)
+                    //.css_name("card")
+                    .build();
+
+                    let checkbox = CheckButton::builder().css_classes(vec!["selection-mode"]).build();
+
+                    row.add_prefix(&checkbox);
+
+                    gnomeshellprefpage.append(&row);
+                }
+                outerbox.append(&gnomeshellprefpage);
+                installed_themes_stack.add_titled(
+                    &outerbox,
+                    Some(&each_item.name.to_string()),
+                    &each_item.name.to_string(),
+                );
+            },
+            Catalog::Gtk4Themes =>  {
+                let outerbox = GtkBox::new(Orientation::Horizontal,0);
+                outerbox.set_vexpand(true);
+                outerbox.set_hexpand(true);
+                outerbox.set_halign(Align::Fill);
+                outerbox.set_valign(Align::Fill);
+                for each_theme_name in &each_item.options{
+                    let row = ActionRow::builder()
+                    .activatable(false)
+                    .title(each_theme_name)
+                    //.css_name("card")
+                    .build();
+
+                    let checkbox = CheckButton::builder().css_classes(vec!["selection-mode"]).build();
+
+                    row.add_suffix(&checkbox);
+
+
+
+
+                    gtk4prefpage.append(&row);
+
+                }
+
+                outerbox.append(&gtk4prefpage);
+                installed_themes_stack.add_titled(
+                    &outerbox,
+                    Some(&each_item.name.to_string()),
+                    &each_item.name.to_string(),
+                );
+            },
+            _ => {},
+        };
+    }
+
+
+
     window.present();
+}
+#[derive(Debug)]
+pub struct InstalledTheme{
+    name: Catalog,
+    options: Vec<String>,
+}
+pub fn get_applied_theme(catalog: Catalog)-> String {
+
+    match catalog{
+        Catalog::Cursors => {
+                let settings = Settings::new("org.gnome.desktop.interface");
+                settings.string("cursor-theme").to_string()
+        },
+        Catalog::FullIconThemes => {
+                let settings = Settings::new("org.gnome.desktop.interface");
+                settings.string("icon-theme").to_string()
+        },
+        Catalog::GnomeShellThemes => {
+                let settings = Settings::new("org.gnome.shell.extensions.user-theme");
+                settings.string("name").to_string()
+        },
+        Catalog::Gtk4Themes => {
+                let settings = Settings::new("org.gnome.desktop.interface");
+                settings.string("gtk-theme").to_string()
+        },
+        _ => {
+            String::from("Wallpapers are not supported")
+        }
+    }
+}
+pub fn apply_theme(catalog: Catalog, theme_name: &str)-> Result<()> {
+
+    match catalog{
+        Catalog::Cursors => {
+                let settings = Settings::new("org.gnome.desktop.interface");
+                settings.set_string("cursor-theme", theme_name)
+                    .expect("Failed to set Cursor theme");
+        },
+        Catalog::FullIconThemes => {
+                let settings = Settings::new("org.gnome.desktop.interface");
+                settings.set_string("icon-theme", theme_name)
+                    .expect("Failed to set Icon theme");
+        },
+        Catalog::GnomeShellThemes => {
+                let settings = Settings::new("org.gnome.shell.extensions.user-theme");
+                settings.set_string("name", theme_name)
+                    .expect("Failed to set Gnome Shell theme");
+        },
+        Catalog::Gtk4Themes => {
+                let settings = Settings::new("org.gnome.desktop.interface");
+                settings.set_string("gtk-theme", theme_name)
+                    .expect("Failed to set GTK theme");
+        },
+        _ => {
+
+        },
+
+    }
+            Ok(())
+}
+pub fn get_all_installed_themes() -> Vec<InstalledTheme>{
+
+            let cursor_icon_paths = ["/home/d/.icons","/home/d/.local/share/icons","/usr/share/icons"];
+
+            let target_filename = "index.theme";
+            let search_string = "[Icon Theme]";
+                //let root_path = "."; // change to your root dir
+                let mut cursorthemes: Vec<String> = vec![];
+                let mut iconthemes: Vec<String> = vec![];
+                for cursor_icon_path in cursor_icon_paths{
+                for entry in WalkDir::new(cursor_icon_path)
+                    .max_depth(2)
+                    .into_iter()
+                    .filter_map(|s|s.ok())
+                    .filter(|e| e.file_name() == target_filename && e.file_type().is_file())
+                {
+                    //println!("Walkdir : {}", entry.path().display());
+                    let path = entry.path();
+                    match fs::read_to_string(path) {
+                        Ok(content) => {
+                            //println!("content : {:?}", &content);
+                            let lines = content.split('\n');
+
+
+                            for line in lines {
+                            if line.contains(search_string) {
+
+                                let cursorpath = path.display().to_string().replace("/index.theme","")+"/cursors";
+
+                                let cursor_path = Path::new(&cursorpath);
+
+                                if Path::new(cursor_path).exists(){
+                                    //println!("{} : {}", path.display().to_string().replace(&target_filename, "").replace(&cursor_icon_path,"").replace("/",""),cursor_icon_path);
+                                    //println!("Cursor Theme : {}", &line);
+                                    //println!("cursorpath : {:?}", &cursorpath);
+                                    //(Catalog::Cursors, path.display().to_string().replace(&target_filename, "").replace(&cursor_icon_path,"").replace("/",""));
+                                    cursorthemes.push(path.display().to_string().replace(&target_filename, "").replace(&cursor_icon_path,"").replace("/",""));
+                                }
+
+                                let iconpath = path.display().to_string().replace("/index.theme","")+"/places";
+
+                                let icon_path = Path::new(&iconpath);
+
+                                if Path::new(icon_path).exists(){
+                                    //println!("{} : {}", path.display().to_string().replace(&target_filename, "").replace(&cursor_icon_path,"").replace("/",""),cursor_icon_path);
+                                    //println!("Cursor Theme : {}", &line);
+                                    //println!("cursorpath : {:?}", &cursorpath);
+                                    //(Catalog::Cursors, path.display().to_string().replace(&target_filename, "").replace(&cursor_icon_path,"").replace("/",""));
+                                    iconthemes.push(path.display().to_string().replace(&target_filename, "").replace(&cursor_icon_path,"").replace("/",""));
+                                }
+                            }
+                            }
+                        }
+                        Err(e) => eprintln!("Could not read {}: {}", path.display(), e),
+                    }
+                }
+                }
+
+
+
+            let gnome_shell_gtk4_paths = ["/home/d/.themes","/home/d/.local/share/themes","/usr/share/themes"];
+
+            let target_filename = "index.theme";
+            let search_string = "Type=X-GNOME-Metatheme";
+                //let root_path = "."; // change to your root dir
+                let mut gnomeshellthemes: Vec<String> = vec![];
+                let mut gtk4themes: Vec<String> = vec![];
+                for gnome_shell_gtk4_path in gnome_shell_gtk4_paths{
+                for entry in WalkDir::new(gnome_shell_gtk4_path)
+                    .max_depth(2)
+                    .into_iter()
+                    .filter_map(|s|s.ok())
+                    .filter(|e| e.file_name() == target_filename && e.file_type().is_file())
+                {
+                    //println!("Walkdir : {}", entry.path().display());
+                    let path = entry.path();
+                    match fs::read_to_string(path) {
+                        Ok(content) => {
+                            //println!("content : {:?}", &content);
+                            let lines = content.split('\n');
+
+
+                            for line in lines {
+                            if line.contains(search_string) {
+
+                                let gnomeshellpath = path.display().to_string().replace("/index.theme","")+"/gnome-shell";
+
+                                let gnomeshell_path = Path::new(&gnomeshellpath);
+
+                                if Path::new(gnomeshell_path).exists(){
+                                    //println!("{} : {}", path.display().to_string().replace(&target_filename, "").replace(&cursor_icon_path,"").replace("/",""),cursor_icon_path);
+                                    //println!("Cursor Theme : {}", &line);
+                                    //println!("cursorpath : {:?}", &cursorpath);
+                                    //(Catalog::Cursors, path.display().to_string().replace(&target_filename, "").replace(&cursor_icon_path,"").replace("/",""));
+                                    gnomeshellthemes.push(path.display().to_string().replace(&target_filename, "").replace(&gnome_shell_gtk4_path,"").replace("/",""));
+                                }
+
+                                let gtk4path = path.display().to_string().replace("/index.theme","")+"/gtk-4.0";
+
+                                let gtk4_path = Path::new(&gtk4path);
+
+                                if Path::new(gtk4_path).exists(){
+                                    //println!("{} : {}", path.display().to_string().replace(&target_filename, "").replace(&cursor_icon_path,"").replace("/",""),cursor_icon_path);
+                                    //println!("Cursor Theme : {}", &line);
+                                    //println!("cursorpath : {:?}", &cursorpath);
+                                    //(Catalog::Cursors, path.display().to_string().replace(&target_filename, "").replace(&cursor_icon_path,"").replace("/",""));
+                                    gtk4themes.push(path.display().to_string().replace(&target_filename, "").replace(&gnome_shell_gtk4_path,"").replace("/",""));
+                                }
+                            }
+                            }
+                        }
+                        Err(e) => eprintln!("Could not read {}: {}", path.display(), e),
+                    }
+                }
+                }
+
+                              let installed_themes : Vec<InstalledTheme> =
+                                    vec![
+                                        InstalledTheme{
+                                            name : Catalog::Cursors,
+                                            options : cursorthemes.clone(),
+                                    },
+                                        InstalledTheme{
+                                            name : Catalog::FullIconThemes,
+                                            options : iconthemes.clone(),
+                                    },
+                                        InstalledTheme{
+                                            name : Catalog::GnomeShellThemes,
+                                            options : gnomeshellthemes.clone(),
+                                    },
+                                        InstalledTheme{
+                                            name : Catalog::Gtk4Themes,
+                                            options : gtk4themes.clone(),
+
+                                    },
+                                    ];
+                //println!("Themes : \n {:#?}", installed_themes);
+                //println!("Get Current Gtk Themes : \n {:#?}", get_applied_theme(Catalog::Gtk4Themes));
+                //println!("Set Gtk Themes to adw-gtk3 : \n {:#?}", apply_theme(Catalog::Gtk4Themes,"adw-gtk3"));
+
+                installed_themes
+
 }
