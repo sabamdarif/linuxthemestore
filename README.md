@@ -1,7 +1,7 @@
-# LinuxThemesStore
+# Linux Theme Store
 ## _NativeWay to install linux themes on your desktop_
 
--  A modern desktop app for discovering, downoading Linux themes, icoirectly from Pling & Opendesktop  
+-  A modern desktop app for discovering, downoading Linux themes, icoirectly from Pling & Opendesktop
 - No browser required.
 - Just browse, click, and beautify your desktop!
 

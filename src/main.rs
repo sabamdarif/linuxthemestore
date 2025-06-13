@@ -2233,28 +2233,28 @@ pub fn get_applied_theme(catalog: Catalog) -> String {
                 .args(["--host", "gsettings", "get", "org.gnome.desktop.interface", "cursor-theme"])
                 .output()
                 .expect("failed to execute gsettings");
-            String::from_utf8_lossy(&output.stdout).trim().to_string()
+            String::from_utf8_lossy(&output.stdout).trim().replace("'","").to_string()
         }
         Catalog::FullIconThemes => {
             let output = Command::new("flatpak-spawn")
                 .args(["--host", "gsettings", "get", "org.gnome.desktop.interface", "icon-theme"])
                 .output()
                 .expect("failed to execute gsettings");
-            String::from_utf8_lossy(&output.stdout).trim().to_string()
+            String::from_utf8_lossy(&output.stdout).trim().replace("'","").to_string()
         }
         Catalog::GnomeShellThemes => {
             let output = Command::new("flatpak-spawn")
                 .args(["--host", "gsettings", "get", "org.gnome.shell.extensions.user-theme", "name"])
                 .output()
                 .expect("failed to execute gsettings");
-            String::from_utf8_lossy(&output.stdout).trim().to_string()
+            String::from_utf8_lossy(&output.stdout).trim().replace("'","").to_string()
         }
         Catalog::Gtk4Themes => {
             let output = Command::new("flatpak-spawn")
                 .args(["--host", "gsettings", "get", "org.gnome.desktop.interface", "gtk-theme"])
                 .output()
                 .expect("failed to execute gsettings");
-            String::from_utf8_lossy(&output.stdout).trim().to_string()
+            String::from_utf8_lossy(&output.stdout).trim().replace("'","").to_string()
         }
         _ => String::from("Wallpapers are not supported"),
     }
