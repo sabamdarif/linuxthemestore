@@ -14,19 +14,27 @@
   <screenshots>
     <screenshot type="default">
       <caption>Light Mode</caption>
-      <image>https://raw.githubusercontent.com/debasish-patra-1987/linuxthemestore/091a55bcc31eb254b90114c6719c200fe5f86b47/screenshots/1.png</image>
-    </screenshot>
-    <screenshot type="default">
-      <caption>Dark Mode</caption>
-      <image>https://raw.githubusercontent.com/debasish-patra-1987/linuxthemestore/091a55bcc31eb254b90114c6719c200fe5f86b47/screenshots/2.png</image>
+      <image>https://raw.githubusercontent.com/debasish-patra-1987/linuxthemestore/dc5530ca10a91c2f21e1d5fcad8b959b0412b164/screenshots/1.png</image>
     </screenshot>
     <screenshot type="default">
       <caption>Light Mode Detailed</caption>
-      <image>https://raw.githubusercontent.com/debasish-patra-1987/linuxthemestore/091a55bcc31eb254b90114c6719c200fe5f86b47/screenshots/3.png</image>
+      <image>https://raw.githubusercontent.com/debasish-patra-1987/linuxthemestore/dc5530ca10a91c2f21e1d5fcad8b959b0412b164/screenshots/2.png</image>
+    </screenshot>
+    <screenshot type="default">
+      <caption>Dark Mode</caption>
+      <image>https://raw.githubusercontent.com/debasish-patra-1987/linuxthemestore/dc5530ca10a91c2f21e1d5fcad8b959b0412b164/screenshots/3.png</image>
     </screenshot>
     <screenshot type="default">
       <caption>Dark Mode Detailed</caption>
-      <image>https://raw.githubusercontent.com/debasish-patra-1987/linuxthemestore/091a55bcc31eb254b90114c6719c200fe5f86b47/screenshots/4.png</image>
+      <image>https://raw.githubusercontent.com/debasish-patra-1987/linuxthemestore/dc5530ca10a91c2f21e1d5fcad8b959b0412b164/screenshots/4.png</image>
+    </screenshot>
+    <screenshot type="default">
+      <caption>Search Page</caption>
+      <image>https://raw.githubusercontent.com/debasish-patra-1987/linuxthemestore/dc5530ca10a91c2f21e1d5fcad8b959b0412b164/screenshots/5.png</image>
+    </screenshot>
+    <screenshot type="default">
+      <caption>Manage Themes</caption>
+      <image>https://raw.githubusercontent.com/debasish-patra-1987/linuxthemestore/dc5530ca10a91c2f21e1d5fcad8b959b0412b164/screenshots/6.png</image>
     </screenshot>
   </screenshots>
   <developer_name>Debasish Patra</developer_name>
