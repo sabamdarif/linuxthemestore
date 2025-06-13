@@ -2227,6 +2227,11 @@ pub struct InstalledTheme {
 }
 pub fn get_applied_theme(catalog: Catalog) -> String {
 
+    Command::new("flatpak-spawn")
+                .args(["--host", "gnome-extensions", "enable", "user-theme@gnome-shell-extensions.gcampax.github.com"])
+                .output()
+                .expect("failed to execute gnome-extensions");
+
     match catalog {
         Catalog::Cursors => {
             let output = Command::new("flatpak-spawn")
