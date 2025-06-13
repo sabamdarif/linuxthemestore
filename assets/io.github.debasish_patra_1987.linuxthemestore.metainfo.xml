@@ -39,7 +39,7 @@
   <releases>
     <release version="1.0.4" date="2025-06-14">
       <description>
-        <p>Manage Installed Themes added to the application</p>
+        <p>Manage Locally Installed Themes</p>
       </description>
     </release>
     <release version="1.0.3" date="2025-06-11">
