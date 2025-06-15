@@ -2236,6 +2236,7 @@ pub fn get_applied_theme(catalog: Catalog) -> String {
             settings.string("icon-theme").to_string()
         }
         Catalog::GnomeShellThemes => {
+            /*
             let settings = Settings::new("org.gnome.shell");
             settings
                 .set_boolean("disable-user-extensions", false)
@@ -2243,7 +2244,8 @@ pub fn get_applied_theme(catalog: Catalog) -> String {
 
             let settings = Settings::new("org.gnome.shell.extensions.user-theme");
             settings.string("name").to_string()
-            //String::new()
+            */
+            String::new()
         }
         Catalog::Gtk4Themes => {
             let settings = Settings::new("org.gnome.desktop.interface");
@@ -2440,10 +2442,12 @@ pub fn get_all_installed_themes() -> Vec<InstalledTheme> {
             name: Catalog::FullIconThemes,
             options: iconthemes.clone(),
         },
+        /*
         InstalledTheme {
             name: Catalog::GnomeShellThemes,
             options: gnomeshellthemes.clone(),
         },
+         */
         InstalledTheme {
             name: Catalog::Gtk4Themes,
             options: gtk4themes.clone(),
