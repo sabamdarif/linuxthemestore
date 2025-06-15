@@ -2236,8 +2236,8 @@ pub fn get_applied_theme(catalog: Catalog) -> String {
             settings.string("icon-theme").to_string()
         }
         Catalog::GnomeShellThemes => {
-            let settings = Settings::new("org.gnome.shell.extensions.user-theme");
-            settings.string("name").to_string()
+            //let settings = Settings::new("org.gnome.shell.extensions.user-theme");
+            //settings.string("name").to_string()
         }
         Catalog::Gtk4Themes => {
             let settings = Settings::new("org.gnome.desktop.interface");
@@ -2261,10 +2261,10 @@ pub fn apply_theme(catalog: Catalog, theme_name: &str) -> Result<()> {
                 .expect("Failed to set Icon theme");
         }
         Catalog::GnomeShellThemes => {
-            let settings = Settings::new("org.gnome.shell.extensions.user-theme");
-            settings
-                .set_string("name", theme_name)
-                .expect("Failed to set Gnome Shell theme");
+            //let settings = Settings::new("org.gnome.shell.extensions.user-theme");
+            //settings
+            //    .set_string("name", theme_name)
+            //    .expect("Failed to set Gnome Shell theme");
         }
         Catalog::Gtk4Themes => {
             let settings = Settings::new("org.gnome.desktop.interface");
