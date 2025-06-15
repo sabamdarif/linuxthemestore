@@ -2229,6 +2229,7 @@ pub fn get_applied_theme(catalog: Catalog) -> String {
     match catalog {
         Catalog::Cursors => {
             let settings = Settings::new("org.gnome.desktop.interface");
+            println!("Getting Cursor Theme : {}", settings.string("cursor-theme").to_string());
             settings.string("cursor-theme").to_string()
         }
         Catalog::FullIconThemes => {
