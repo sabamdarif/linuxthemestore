@@ -2229,7 +2229,6 @@ pub fn get_applied_theme(catalog: Catalog) -> String {
     match catalog {
         Catalog::Cursors => {
             let settings = Settings::new("org.gnome.desktop.interface");
-            println!("Getting Cursor Theme : {}", settings.string("cursor-theme").to_string());
             settings.string("cursor-theme").to_string()
         }
         Catalog::FullIconThemes => {
@@ -2237,9 +2236,14 @@ pub fn get_applied_theme(catalog: Catalog) -> String {
             settings.string("icon-theme").to_string()
         }
         Catalog::GnomeShellThemes => {
-            //let settings = Settings::new("org.gnome.shell.extensions.user-theme");
-            //settings.string("name").to_string()
-            String::new()
+            let settings = Settings::new("org.gnome.shell");
+            settings
+                .set_boolean("disable-user-extensions", false)
+                .expect("Failed to set Gnome Shell theme");
+
+            let settings = Settings::new("org.gnome.shell.extensions.user-theme");
+            settings.string("name").to_string()
+            //String::new()
         }
         Catalog::Gtk4Themes => {
             let settings = Settings::new("org.gnome.desktop.interface");
