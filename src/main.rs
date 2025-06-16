@@ -2135,7 +2135,7 @@ fn build_ui(app: &adw::Application) {
 
                 group.set_title("Change Styles");
                 page.add(&group);
-            }
+            }/*
             Catalog::GnomeShellThemes => {
                 // Create the ListStore model
                 let model: adw::gio::ListStore =
@@ -2174,7 +2174,7 @@ fn build_ui(app: &adw::Application) {
                 group.add(&combo);
 
                 page.add(&group);
-            }
+            } */
             Catalog::Gtk4Themes => {
                 // Create the ListStore model
                 let model: adw::gio::ListStore =
@@ -2229,10 +2229,12 @@ pub fn get_applied_theme(catalog: Catalog) -> String {
     match catalog {
         Catalog::Cursors => {
             let settings = Settings::new("org.gnome.desktop.interface");
+            println!("Cursor Theme : {}", settings.string("cursor-theme").to_string());
             settings.string("cursor-theme").to_string()
         }
         Catalog::FullIconThemes => {
             let settings = Settings::new("org.gnome.desktop.interface");
+            println!("Icon Theme : {}", settings.string("icon-theme").to_string());
             settings.string("icon-theme").to_string()
         }
         Catalog::GnomeShellThemes => {
@@ -2249,6 +2251,7 @@ pub fn get_applied_theme(catalog: Catalog) -> String {
         }
         Catalog::Gtk4Themes => {
             let settings = Settings::new("org.gnome.desktop.interface");
+            println!("Gtk Theme : {}", settings.string("gtk-theme").to_string());
             settings.string("gtk-theme").to_string()
         }
         _ => String::from("Wallpapers are not supported"),
