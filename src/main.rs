@@ -5,6 +5,7 @@ use adw::gio::prelude::SettingsExt;
 use adw::gio::Settings;
 use adw::glib::object::Cast;
 use adw::glib::object::IsA;
+use adw::glib::object::ObjectExt;
 use adw::glib::types::StaticType;
 use adw::gtk::DrawingArea;
 use adw::gtk::SearchEntry;
@@ -2035,23 +2036,52 @@ fn build_ui(app: &adw::Application) {
     build_search_page(&body_viewstack, &outer_view_stack, &window);
 
     let installed_themes_box = GtkBox::new(Orientation::Vertical, 5);
+    installed_themes_box.set_widget_name("Installed_themes_box");
     installed_themes_box.set_width_request(500);
 
     let themes = get_all_installed_themes();
 
     let _body_viewstack =
         body_viewstack.add_titled(&installed_themes_box, Some("Installed"), "Installed");
-    let page = PreferencesPage::new();
-    page.set_vexpand(true);
-    page.set_valign(Align::Center);
-    installed_themes_box.append(&page);
+
+
     /*
     installed_themes_box.append(&fulliconprefpage);
     installed_themes_box.append(&cursorprefpage);
     installed_themes_box.append(&gnomeshellprefpage);
     installed_themes_box.append(&gtk4prefpage);
     */
+
     //let installed_themes_Switcher = InlineViewSwitcher::builder().build();
+    //populate_installed_themes_page(themes,&installed_themes_box, page.clone());
+
+    body_viewstack.connect_visible_child_name_notify(move |view_stack| {
+    //installed_themes_box.remove(&page);
+
+        println!("connect_notify_local triggered : {}",view_stack.visible_child().unwrap().widget_name());
+        if let Some(visible_child) = view_stack.visible_child() {
+            if visible_child.widget_name() == "Installed_themes_box"{
+                if installed_themes_box.last_child().is_some(){
+                    let child = installed_themes_box.last_child().unwrap();
+                    installed_themes_box.remove(&child);
+                }
+            println!("connect_notify_local triggered Install page");
+
+
+            let page = PreferencesPage::new();
+            page.set_vexpand(true);
+            page.set_valign(Align::Center);
+            installed_themes_box.append(&page);
+            populate_installed_themes_page(get_all_installed_themes(),&installed_themes_box, page);
+            }
+        }
+    });
+
+    window.present();
+}
+
+pub fn populate_installed_themes_page(themes: Vec<InstalledTheme>, installed_themes_box: &GtkBox,page: PreferencesPage) {
+
 
     for each_item in themes {
         match each_item.name {
@@ -2231,10 +2261,9 @@ fn build_ui(app: &adw::Application) {
             _ => {}
         };
     }
-
-    window.present();
 }
-#[derive(Debug)]
+
+#[derive(Debug,Clone)]
 pub struct InstalledTheme {
     name: Catalog,
     options: Vec<String>,
