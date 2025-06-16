@@ -469,7 +469,7 @@ fn install_tar(path: &str, theme_type: &Catalog) -> Result<()> {
             extract_path.push(".local/share/wallpapers");
         }
     }
-
+    println!("Installation Path : {}", &extract_path.display());
     fs::create_dir_all(&extract_path)?;
     println!("Theme Type : {:?}", theme_type);
     println!("Path : {}", &path);
@@ -2085,7 +2085,7 @@ fn build_ui(app: &adw::Application) {
                     .options
                     .iter()
                     .position(|s| s.eq_ignore_ascii_case(&get_applied_theme(name.clone())))
-                    .unwrap_or_default();
+                    .unwrap_or_else(||1);
                 let index = u32::try_from(index).expect("Value too large for u32");
                 combo.set_selected(index);
 
@@ -2126,7 +2126,7 @@ fn build_ui(app: &adw::Application) {
                     .options
                     .iter()
                     .position(|s| s.eq_ignore_ascii_case(&get_applied_theme(name.clone())))
-                    .unwrap_or_default();
+                    .unwrap_or_else(||1);
                 let index = u32::try_from(index).expect("Value too large for u32");
                 combo.set_selected(index);
                 // Pack into preferences UI
@@ -2166,7 +2166,7 @@ fn build_ui(app: &adw::Application) {
                     .options
                     .iter()
                     .position(|s| s.eq_ignore_ascii_case(&get_applied_theme(name.clone())))
-                    .unwrap_or_default();
+                    .unwrap_or_else(||1);
                 let index = u32::try_from(index).expect("Value too large for u32");
                 combo.set_selected(index);
                 // Pack into preferences UI
@@ -2205,7 +2205,7 @@ fn build_ui(app: &adw::Application) {
                     .options
                     .iter()
                     .position(|s| s.eq_ignore_ascii_case(&get_applied_theme(name.clone())))
-                    .unwrap_or_default();
+                    .unwrap_or_else(||1);;
                 let index = u32::try_from(index).expect("Value too large for u32");
                 combo.set_selected(index);
                 // Pack into preferences UI
