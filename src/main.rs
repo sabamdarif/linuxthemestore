@@ -2381,11 +2381,11 @@ pub fn get_all_installed_themes() -> Vec<InstalledTheme> {
                             }
 
                             let iconpath =
-                                path.display().to_string().replace("/index.theme", "") + "/places";
+                                path.display().to_string().replace("/index.theme", "") + "/cursors";
 
                             let icon_path = Path::new(&iconpath);
 
-                            if Path::new(icon_path).exists() {
+                            if !Path::new(icon_path).exists() {
                                 //println!("{} : {}", path.display().to_string().replace(&target_filename, "").replace(&cursor_icon_path,"").replace("/",""),cursor_icon_path);
                                 //println!("Cursor Theme : {}", &line);
                                 //println!("cursorpath : {:?}", &cursorpath);
