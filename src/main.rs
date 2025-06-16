@@ -2093,7 +2093,7 @@ pub fn populate_installed_themes_page(themes: Vec<InstalledTheme>, installed_the
                 // Populate the model dynamically
                 for item in &each_item.options {
                     let itemstr = StringObject::new(&item.clone());
-                    if itemstr != StringObject::new("Adwaita"){
+                    if !item.eq("Adwaita"){
                         model.append(&itemstr);
                     }
                 }
@@ -2138,7 +2138,7 @@ pub fn populate_installed_themes_page(themes: Vec<InstalledTheme>, installed_the
                 // Populate the model dynamically
                 for item in &each_item.options {
                     let itemstr = StringObject::new(&item.clone());
-                    if itemstr != StringObject::new("Adwaita"){
+                    if !item.eq("Adwaita"){
                         model.append(&itemstr);
                     }
                 }
@@ -2220,7 +2220,7 @@ pub fn populate_installed_themes_page(themes: Vec<InstalledTheme>, installed_the
                 // Populate the model dynamically
                 for item in &each_item.options {
                     let itemstr = StringObject::new(&item.clone());
-                    if itemstr != StringObject::new("Adwaita"){
+                    if !item.eq("Adwaita"){
                     model.append(&itemstr);
                     }
                 }
