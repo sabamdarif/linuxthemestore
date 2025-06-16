@@ -1,4 +1,5 @@
 use adw::gio::prelude::ListModelExt;
+use adw::gio::prelude::ListModelExtManual;
 use adw::gio::prelude::SettingsExt;
 
 use adw::gio::Settings;
@@ -2058,11 +2059,13 @@ fn build_ui(app: &adw::Application) {
                 // Create the ListStore model
                 let model: adw::gio::ListStore =
                     adw::gio::ListStore::with_type(StringObject::static_type());
-
+                model.append(&StringObject::new("Adwaita"));
                 // Populate the model dynamically
                 for item in &each_item.options {
                     let itemstr = StringObject::new(&item.clone());
-                    model.append(&itemstr);
+                    if itemstr != StringObject::new("Adwaita"){
+                        model.append(&itemstr);
+                    }
                 }
 
                 // Create the ComboRow
@@ -2085,7 +2088,9 @@ fn build_ui(app: &adw::Application) {
                     .options
                     .iter()
                     .position(|s| s.eq_ignore_ascii_case(&get_applied_theme(name.clone())))
-                    .unwrap_or_else(||1);
+                    .unwrap_or_else(||0);
+                println!("Icon THeme Index : {}",index);
+                println!("Icon THeme Options : {:#?}",each_item.options);
                 let index = u32::try_from(index).expect("Value too large for u32");
                 combo.set_selected(index);
 
@@ -2099,11 +2104,13 @@ fn build_ui(app: &adw::Application) {
                 // Create the ListStore model
                 let model: adw::gio::ListStore =
                     adw::gio::ListStore::with_type(StringObject::static_type());
-
+                model.append(&StringObject::new("Adwaita"));
                 // Populate the model dynamically
                 for item in &each_item.options {
                     let itemstr = StringObject::new(&item.clone());
-                    model.append(&itemstr);
+                    if itemstr != StringObject::new("Adwaita"){
+                        model.append(&itemstr);
+                    }
                 }
 
                 // Create the ComboRow
@@ -2126,7 +2133,7 @@ fn build_ui(app: &adw::Application) {
                     .options
                     .iter()
                     .position(|s| s.eq_ignore_ascii_case(&get_applied_theme(name.clone())))
-                    .unwrap_or_else(||1);
+                    .unwrap_or_else(||0);
                 let index = u32::try_from(index).expect("Value too large for u32");
                 combo.set_selected(index);
                 // Pack into preferences UI
@@ -2179,13 +2186,15 @@ fn build_ui(app: &adw::Application) {
                 // Create the ListStore model
                 let model: adw::gio::ListStore =
                     adw::gio::ListStore::with_type(StringObject::static_type());
-
+                model.append(&StringObject::new("Adwaita"));
                 // Populate the model dynamically
                 for item in &each_item.options {
                     let itemstr = StringObject::new(&item.clone());
+                    if itemstr != StringObject::new("Adwaita"){
                     model.append(&itemstr);
+                    }
                 }
-
+                println!("Gtk THeme Options : {:#?}",model.clone());
                 // Create the ComboRow
                 let combo = ComboRow::builder()
                     .title(each_item.name.to_string())
@@ -2201,11 +2210,16 @@ fn build_ui(app: &adw::Application) {
                     }
                 });
                 let name = Catalog::Gtk4Themes;
+                println!("Catalog:: Gtk4Themes ::> {}",name.to_string());
+
+                println!("Catalog:: Gtk4Themes ::> {}",get_applied_theme(name.clone()));
                 let index = each_item
                     .options
                     .iter()
                     .position(|s| s.eq_ignore_ascii_case(&get_applied_theme(name.clone())))
-                    .unwrap_or_else(||1);;
+                    .unwrap_or_else(||0);
+                println!("Gtk THeme Index : {}",index);
+
                 let index = u32::try_from(index).expect("Value too large for u32");
                 combo.set_selected(index);
                 // Pack into preferences UI
