@@ -37,6 +37,16 @@
   <url type="bugtracker">https://github.com/debasish-patra-1987/linuxthemestore/issues</url>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="1.0.4" date="2025-06-17">
+      <description>
+        <p>Added ability to apply themes for </p>
+          <ul>
+            <li>Gtk4 Themes</li>
+            <li>Icon Themes</li>
+            <li>Cursor Themes</li>
+          </ul>
+      </description>
+    </release>
     <release version="1.0.3" date="2025-06-11">
       <description>
         <p>Features</p>
