@@ -436,7 +436,7 @@ fn fetch_url(url: &String, file_name: String) -> Result<()> {
     Ok(())
 }
 fn install_theme(downloaddetail: &DownloadDetail, themetype: &Catalog) -> Result<()> {
-    let mut path = String::from("/tmp/themedownloadfiles/");
+    let mut path = String::from("/data/data/com.termux/files/usr/tmp/themedownloadfiles/");
     path.push_str(themetype.to_string());
     path.push_str("/");
 
@@ -659,7 +659,7 @@ fn downloadthumb(each_product: &Product) -> Result<()> {
         return Ok(());
     }
     let firstimage = firstimage.unwrap();
-    let save_path = "/tmp/themeinstaller/cache/".to_string() + &firstimage;
+    let save_path = "/data/data/com.termux/files/usr/tmp/themeinstaller/cache/".to_string() + &firstimage;
     if !std::path::Path::new(&save_path).exists() {
         let mut save_dir = save_path.to_string();
         save_dir.push_str(&firstimage);
@@ -680,7 +680,7 @@ fn downloadotherimages(each_product: &Product) -> Result<()> {
     //println!("Got inside Download Thumbnail");
 
     for each_image in &each_product.previewpics[1..] {
-        let save_path = "/tmp/themeinstaller/cache/".to_string() + &each_image;
+        let save_path = "/data/data/com.termux/files/usr/tmp/themeinstaller/cache/".to_string() + &each_image;
         if !std::path::Path::new(&save_path).exists() {
             let mut save_dir = save_path.to_string();
             save_dir.push_str(&each_image);
@@ -715,7 +715,7 @@ fn _downloadthumbs(products: Vec<Product>) -> Result<()> {
             //println!("Image link : {:?}", image_small.clone().unwrap());
             //println!("In async tokio");
             for image_small in image_small_list {
-                let save_path = "/tmp/themeinstaller/cache/".to_string() + &image_small;
+                let save_path = "/data/data/com.termux/files/usr/tmp/themeinstaller/cache/".to_string() + &image_small;
                 if !std::path::Path::new(&save_path).exists() {
                     let mut save_dir = save_path.to_string();
                     save_dir.push_str(&image_small);
@@ -889,7 +889,7 @@ fn build_installed_page(
 }
 // contentbox function
 fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &ApplicationWindow) {
-    let imgpath = "/tmp/themeinstaller/cache/".to_string() + &each_product.previewpics[0];
+    let imgpath = "/data/data/com.termux/files/usr/tmp/themeinstaller/cache/".to_string() + &each_product.previewpics[0];
     let img = Picture::builder()
         .valign(Align::Center)
         .hexpand_set(false)
@@ -1198,7 +1198,7 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
 
         //Insert Images in dialog body
         let total_preview_pics = product.previewpics.len();
-        let imgpath = "/tmp/themeinstaller/cache/".to_string() + &product.previewpics[0];
+        let imgpath = "/data/data/com.termux/files/usr/tmp/themeinstaller/cache/".to_string() + &product.previewpics[0];
         let img = Picture::builder()
             .valign(Align::Center)
             .hexpand_set(true)
@@ -1270,7 +1270,7 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
             }
             let current_index = *current_index as usize;
 
-            let imgpath = "/tmp/themeinstaller/cache/".to_string() + &previewpics[current_index];
+            let imgpath = "/data/data/com.termux/files/usr/tmp/themeinstaller/cache/".to_string() + &previewpics[current_index];
             img_prev.set_filename(Some(&std::path::Path::new(imgpath.as_str())));
         });
 
@@ -1287,7 +1287,7 @@ fn build_flowbox_for_page(each_product: &Product, flowbox: &FlowBox, window: &Ap
             }
             let current_index = *current_index as usize;
             let imgpath =
-                "/tmp/themeinstaller/cache/".to_string() + &previewpics_next[current_index];
+                "/data/data/com.termux/files/usr/tmp/themeinstaller/cache/".to_string() + &previewpics_next[current_index];
             img_next.set_filename(Some(&std::path::Path::new(imgpath.as_str())));
         });
         //imgclamp.hide();
@@ -2337,7 +2337,7 @@ pub fn get_all_installed_themes() -> Vec<InstalledTheme> {
     let cursor_icon_paths = [
         &(home_dir.clone() + "/.icons"),
         &(home_dir.clone() + "/.local/share/icons"),
-        "/usr/share/icons",
+        "/data/data/com.termux/files/usr/share/icons",
     ];
 
     let target_filename = "index.theme";
@@ -2409,7 +2409,7 @@ pub fn get_all_installed_themes() -> Vec<InstalledTheme> {
     let gnome_shell_gtk4_paths = [
         &(home_dir.clone() + "/.themes"),
         &(home_dir.clone() + "/.local/share/themes"),
-        "/usr/share/themes",
+        "/data/data/com.termux/files/usr/share/themes",
     ];
 
     let target_filename = "index.theme";
