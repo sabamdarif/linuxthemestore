@@ -1,29 +1,87 @@
-# LinuxThemesStore
-## _NativeWay to install linux themes on your desktop_
-
+# Linux Theme Store
+**Browse, Search Categorically and manage installed themes for your Gnome/Gtk based desktop**
 -  A modern desktop app for discovering, downoading Linux themes, icoirectly from Pling & Opendesktop  
 - No browser required.
 - Just browse, click, and beautify your desktop!
 
+## Releases
+
+### 1.0.4 (2025-06-17)
+**Added ability to apply themes for:**
+- Gtk4 Themes
+- Icon Themes
+- Cursor Themes
+
+### 1.0.3 (2025-06-11)
+**Features:**
+- Search is now separate and includes all categories
+- Added Wallpapers
+- Added autoscrolling when bottom of the category page is reached
+
+### 1.0.2 (2025-06-06)
+**Features:**
+- Added Search functionality
+- Redundant Code Cleanup
+
+
+### 1.0.1 (2025-06-04)
+**Performance improvements:**
+- Better Image Quality for verifying themes
+- Quicker Pagination and page loading
+- UI Design improvements
+- Redundant Code Cleanup
+
+
+### 1.0.0 (2025-05-28)
+**Initial Release**
+
+---
 Here are some screenshots & video preview
 
-[![Thumbnail](https://i.ibb.co/v64sy4yh/1.png)](https://i.ibb.co/mV5vZ5Z0/1.png)[![Thumbnail](https://i.ibb.co/Xhqqdd8/2.png)](https://i.ibb.co/63kkppB/2.png)
+[![Thumbnail](https://raw.githubusercontent.com/debasish-patra-1987/linuxthemestore/091a55bcc31eb254b90114c6719c200fe5f86b47/screenshots/1.png)](https://raw.githubusercontent.com/debasish-patra-1987/linuxthemestore/091a55bcc31eb254b90114c6719c200fe5f86b47/screenshots/1.png)
 
-[![Thumbnail](https://i.ibb.co/DfKX8bBj/3.png)](https://i.ibb.co/k2cn9yLP/3.png)[![Thumbnail](https://i.ibb.co/k25gTmCv/4.png)](https://i.ibb.co/s9bv4WYz/4.png)
+[![Thumbnail](https://raw.githubusercontent.com/debasish-patra-1987/linuxthemestore/091a55bcc31eb254b90114c6719c200fe5f86b47/screenshots/2.png)](https://raw.githubusercontent.com/debasish-patra-1987/linuxthemestore/091a55bcc31eb254b90114c6719c200fe5f86b47/screenshots/1.png)
 
-[![Thumbnail](https://i.ibb.co/V0TK6Sgg/5.png)](https://i.ibb.co/nqjWpc77/5.png)
+[![Thumbnail](https://raw.githubusercontent.com/debasish-patra-1987/linuxthemestore/091a55bcc31eb254b90114c6719c200fe5f86b47/screenshots/3.png)](https://raw.githubusercontent.com/debasish-patra-1987/linuxthemestore/091a55bcc31eb254b90114c6719c200fe5f86b47/screenshots/3.png)
+
+[![Thumbnail](https://raw.githubusercontent.com/debasish-patra-1987/linuxthemestore/091a55bcc31eb254b90114c6719c200fe5f86b47/screenshots/4.png)](https://raw.githubusercontent.com/debasish-patra-1987/linuxthemestore/091a55bcc31eb254b90114c6719c200fe5f86b47/screenshots/4.png)
+
 
 [![alt text](https://i.ibb.co/V0TK6Sgg/5.png)](https://github.com/debasish-patra-1987/linuxthemestore/raw/refs/heads/main/screenshots/screencastsample.mp4)
 
+
+## Flatpak
+
+[![Flathub](https://flathub.org/assets/badges/flathub-badge-en.svg)](https://flathub.org/apps/io.github.debasish_patra_1987.linuxthemestore)
+
 ## Installation
+
 For Arch Linux Build is available in aur..
-```sh
+```
 yay -S linuxthemestore-git
 ```
-## _Flatpak_
 
-flatpak install flathub io.github.debasish_patra_1987.linuxthemestore
+Manual Installation via root
+```
+git clone https://github.com/debasish-patra-1987/linuxthemestore.git
+cd linuxthemestore
+git checkout 46818ef6e0378afcd6f510a472b751a5651a989f
+cargo build --release
+install -Dm755 ./target/release/linuxthemestore -t /usr/bin/
+install -Dm644 ./assets/io.github.debasish_patra_1987.linuxthemestore.metainfo.xml -t /usr/share/metainfo
+install -Dm644 ./assets/io.github.debasish_patra_1987.linuxthemestore.svg -t /usr/share/icons/hicolor/scalable/apps
+mv ./assets/io.github.debasish_patra_1987.linuxthemestore.in ./assets/io.github.debasish_patra_1987.linuxthemestore.desktop
+desktop-file-install --dir=/usr/share/applications ./assets/io.github.debasish_patra_1987.linuxthemestore.desktop
 
+```
+
+Manual Uninstallation via root
+```
+rm /usr/bin/linuxthemestore
+rm /usr/share/metainfo/io.github.debasish_patra_1987.linuxthemestore.metainfo.xml
+rm /usr/share/icons/hicolor/scalable/apps/io.github.debasish_patra_1987.linuxthemestore.svg
+rm /usr/share/applications/io.github.debasish_patra_1987.linuxthemestore.desktop
+```
 ## License
 GPL3+
 
