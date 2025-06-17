@@ -85,3 +85,6 @@ rm /usr/share/applications/io.github.debasish_patra_1987.linuxthemestore.desktop
 ## License
 GPL3+
 
+If you are happy with my work, please consider donating 
+
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-yellow?logo=buy-me-a-coffee&logoColor=white&style=for-the-badge)](coff.ee/patradebasish1987)
