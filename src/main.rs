@@ -340,7 +340,7 @@ impl ProductPageProps {
     }
     pub fn get_url(&self) -> String {
         //let base_url: Result<String> = get_env_val("BASE_URL");
-        let base_url = String::from("www.pling.com");
+        let base_url = String::from("api.opendesktop.org");
         /*println!("URL : {}", String::from("https://")
         + &base_url
         + "/ocs/v1/content/data?format=json&pagesize="
@@ -386,7 +386,7 @@ impl SearchPageProps {
     }
     pub fn get_search_url(&self) -> String {
         //let base_url: Result<String> = get_env_val("BASE_URL");
-        let base_url = String::from("www.pling.com");
+        let base_url = String::from("api.opendesktop.org");
         String::from("https://")
             + &base_url
             + "/ocs/v1/content/data?format=json&categories=132,107,134,135,295&pagesize="
