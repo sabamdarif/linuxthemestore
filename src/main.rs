@@ -70,8 +70,11 @@ pub struct ProductCatalog {
     pub status: String,
     pub statuscode: i64,
     pub message: String,
+    #[serde(default)]
     pub totalitems: i64,
+    #[serde(default)]
     pub itemsperpage: i64,
+    #[serde(default)]
     pub data: Vec<Product>,
 }
 
@@ -619,16 +622,42 @@ pub fn get_product_catalog(prodpageprops: &ProductPageProps) -> Result<ProductCa
     let client = Client::new();
     let url = prodpageprops.get_url();
     let url = url.as_str();
-    let res: serde_json::Value = client
-        .get(url)
-        .send()
-        .expect(format!("Invalid Url : {}", url).as_str())
-        .json()
-        .expect("Failed to get payload");
-    //println!("{}", serde_json::to_string_pretty(&res).unwrap());
+    println!("Fetching URL: {}", url);
+    
+    let res_result = client.get(url).send();
+    
+    let res = match res_result {
+        Ok(response) => {
+            println!("Response status: {}", response.status());
+            if !response.status().is_success() {
+                 println!("Request failed with status: {}", response.status());
+                 // Return a default/empty catalog or error
+                 return Err("Request failed".into());
+            }
+            match response.json::<serde_json::Value>() {
+                Ok(json) => json,
+                Err(e) => {
+                    println!("Failed to parse JSON: {}", e);
+                    return Err(Box::new(e));
+                }
+            }
+        },
+        Err(e) => {
+             println!("Network request failed: {}", e);
+             return Err(Box::new(e));
+        }
+    };
 
-    let resp_json_products: ProductCatalog = serde_json::from_value(res).unwrap();
-    //println!("{}", serde_json::to_string_pretty(&resp_json_products).unwrap());
+    // println!("Response JSON: {}", serde_json::to_string_pretty(&res).unwrap_or_default());
+
+    let resp_json_products: ProductCatalog = match serde_json::from_value(res) {
+        Ok(catalog) => catalog,
+        Err(e) => {
+            println!("Failed to deserialize ProductCatalog: {}", e);
+            return Err(Box::new(e));
+        }
+    };
+
     Ok(resp_json_products)
 }
 
@@ -1612,7 +1641,13 @@ fn build_content_box(
                 let mut productpage_mutex = loadmore_productpage_ref.lock().unwrap();
                 let productprops = productpage_mutex.deref_mut();
                 productprops.set_page(productprops.pageno + 1);
-                let productcatalog: ProductCatalog = get_product_catalog(&productprops).unwrap();
+                let productcatalog: ProductCatalog = match get_product_catalog(&productprops) {
+                    Ok(catalog) => catalog,
+                    Err(err) => {
+                        println!("Error fetching catalog (load more): {}", err);
+                        ProductCatalog::default()
+                    }
+                };
                 //downloadthumbs(productcatalog.data.clone()).unwrap();
                 sender.send_blocking(productcatalog).unwrap_or_default();
             });
@@ -1636,7 +1671,13 @@ fn build_content_box(
                 let mut productpage_mutex = loadmore_productpage_ref.lock().unwrap();
                 let productprops = productpage_mutex.deref_mut();
                 productprops.set_page(productprops.pageno + 1);
-                let productcatalog: ProductCatalog = get_product_catalog(&productprops).unwrap();
+                let productcatalog: ProductCatalog = match get_product_catalog(&productprops) {
+                    Ok(catalog) => catalog,
+                    Err(err) => {
+                        println!("Error fetching catalog (initial scroll): {}", err);
+                        ProductCatalog::default()
+                    }
+                };
                 //downloadthumbs(productcatalog.data.clone()).unwrap();
                 sender.send_blocking(productcatalog).unwrap_or_default();
             });
@@ -1654,7 +1695,13 @@ fn build_content_box(
             let productpage = productpage_mutex.deref();
             let productprops = productpage.clone();
 
-            let productcatalog: ProductCatalog = get_product_catalog(&productprops).unwrap();
+            let productcatalog: ProductCatalog = match get_product_catalog(&productprops) {
+                Ok(catalog) => catalog,
+                Err(err) => {
+                    println!("Error fetching catalog (realize): {}", err);
+                    ProductCatalog::default()
+                }
+            };
             //downloadthumbs(productcatalog.data.clone()).unwrap();
             sender.send_blocking(productcatalog).unwrap_or_default();
         });
